@@ -1,0 +1,7 @@
+node_modules
+.vscode
+
+*.pyc
+*.log
+*.pot
+__pycache__/
