@@ -9,7 +9,9 @@ import {
   LOGOUT_SUCCESS,
   REGISTER_FAIL,
   REGISTER_SUCCESS,
+  GET_ERRORS,
 } from "../actions/types";
+import { createMessage } from "../actions/messages";
 
 export const loadUser = () => (dispatch, getState) => {
   dispatch({ type: USER_LOADING });
@@ -45,14 +47,21 @@ export const login = (username, password) => (dispatch) => {
   axios
     .post("/api/auth/login", bodyRequest, config)
     .then((res) => {
+      dispatch(createMessage({ loginSuccess: "Zalogowano pomyślnie" }));
       dispatch({
         type: LOGIN_SUCCESS,
         payload: res.data,
       });
     })
     .catch((err) => {
-      //TODO
-      console.log(err);
+      const error = {
+        message: err.response.data,
+        status: err.response.status,
+      };
+      dispatch({
+        type: GET_ERRORS,
+        payload: error,
+      });
       dispatch({
         type: LOGIN_FAIL,
       });
@@ -65,13 +74,20 @@ export const logout = () => (dispatch, getState) => {
   axios
     .post("/api/auth/logout", null, config)
     .then((res) => {
+      dispatch(createMessage({ logoutSuccess: "Wylogowano pomyślnie" }));
       dispatch({
         type: LOGOUT_SUCCESS,
       });
     })
     .catch((err) => {
-      //TODO
-      console.log(err);
+      const error = {
+        message: err.response.data,
+        status: err.response.status,
+      };
+      dispatch({
+        type: GET_ERRORS,
+        payload: error,
+      });
     });
 };
 
@@ -87,14 +103,22 @@ export const register = ({ username, email, password }) => (dispatch) => {
   axios
     .post("/api/auth/register", bodyRequest, config)
     .then((res) => {
+      dispatch(createMessage({ registerSuccess: "Pomyślnie utworzono konto" }));
       dispatch({
         type: REGISTER_SUCCESS,
         payload: res.data,
       });
     })
     .catch((err) => {
-      //TODO
-      console.log(err);
+      console.log(err.response.data);
+      const error = {
+        message: err.response.data,
+        status: err.response.status,
+      };
+      dispatch({
+        type: GET_ERRORS,
+        payload: error,
+      });
       dispatch({
         type: REGISTER_FAIL,
       });
