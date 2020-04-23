@@ -1,7 +1,9 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, UserProfileSerializer, TennisProfileSerializer
+from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 
 # register API
@@ -42,3 +44,22 @@ class UserAPI(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class UserProfileAPI(generics.RetrieveUpdateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = UserProfileSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def put(self, request, *args, **kwargs):
+        user = User.objects.get(username=request.data['username'])
+        serializer = self.get_serializer(user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return JsonResponse(serializer.data)
+

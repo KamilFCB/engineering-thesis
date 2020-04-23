@@ -33,3 +33,10 @@ class LoginSerializer(serializers.Serializer):
             return user
 
         raise serializers.ValidationError("Błędny login i/lub hasło")
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name')
+
