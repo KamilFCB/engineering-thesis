@@ -4,6 +4,7 @@ from knox.models import AuthToken
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, UserProfileSerializer, TennisProfileSerializer
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from .models import TennisProfile
 
 
 # register API
@@ -63,3 +64,23 @@ class UserProfileAPI(generics.RetrieveUpdateAPIView):
         serializer.save()
         return JsonResponse(serializer.data)
 
+
+class TennisProfileAPI(generics.RetrieveUpdateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = TennisProfileSerializer
+
+    def get_object(self):
+        profile = TennisProfile.objects.get(user_id=self.request.user)
+        serializer = self.get_serializer(profile)
+
+        return serializer.data
+
+    def put(self, request, *args, **kwargs):
+        profile = TennisProfile.objects.get(user_id=self.request.user)
+        serializer = self.get_serializer(profile, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return JsonResponse(serializer.data)
