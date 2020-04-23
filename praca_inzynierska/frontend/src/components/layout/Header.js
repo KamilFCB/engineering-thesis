@@ -26,6 +26,10 @@ export class Header extends Component {
             {user ? `${user.username}` : ""}
           </a>
           <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+            <Link to="/profile" className="dropdown-item">
+              Profil
+            </Link>
+            <div className="dropdown-divider"></div>
             <a className="dropdown-item" onClick={this.props.logout}>
               Wyloguj
             </a>

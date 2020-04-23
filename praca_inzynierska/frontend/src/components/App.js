@@ -10,6 +10,7 @@ import Header from "./layout/Header";
 import Alert from "./layout/Alert";
 import MainPage from "./layout/MainPage";
 import Login from "./accounts/Login";
+import Profile from "./accounts/Profile";
 import Register from "./accounts/Register";
 import PrivateRoute from "./common/PrivateRoute";
 import { loadUser } from "../actions/auth";
@@ -39,6 +40,7 @@ class App extends React.Component {
                   <Route exact path="/" component={MainPage} />
                   <Route exact path="/register" component={Register} />
                   <Route exact path="/login" component={Login} />
+                  <PrivateRoute exact path="/profile" component={Profile} />
                 </Switch>
               </div>
               <Alert />
