@@ -48,8 +48,6 @@ class TennisProfileSerializer(serializers.ModelSerializer):
         fields = ('residence', 'birth_date', 'weight', 'height', 'forehand', 'backhand', 'user_id')
 
     def update(self, instance, validated_data):
-        print("update")
-        print(validated_data)
         instance.residence = validated_data['residence']
         instance.birth_date = validated_data['birth_date']
         instance.weight = validated_data['weight']
