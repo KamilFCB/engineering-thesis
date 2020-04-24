@@ -39,6 +39,15 @@ export class Alert extends Component {
       if (message.registerSuccess) {
         alert.success(message.registerSuccess);
       }
+      if (message.profileLoadError) {
+        alert.error(message.profileLoadError);
+      }
+      if (message.updateError) {
+        alert.error(message.updateError);
+      }
+      if (message.updateSuccess) {
+        alert.success(message.updateSuccess);
+      }
     }
   }
 
