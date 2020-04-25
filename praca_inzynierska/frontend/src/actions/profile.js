@@ -98,11 +98,9 @@ export const updateTennisProfile = ({
     forehand,
     backhand,
   });
-  console.log(bodyRequest);
   axios
     .put("/api/user/tennis_profile", bodyRequest, config)
     .then((res) => {
-      console.log(res);
       dispatch(
         createMessage({
           updateSuccess: "Profil tenisowy został zaktualizowany",
@@ -110,7 +108,6 @@ export const updateTennisProfile = ({
       );
     })
     .catch((err) => {
-      console.log(err);
       dispatch(
         createMessage({
           updateError: "Nie udało się zaktualizować profilu, spróbuj ponownie",

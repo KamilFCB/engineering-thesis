@@ -128,7 +128,7 @@ export class TennisProfile extends Component {
                 name="forehand"
                 className="form-control"
                 onChange={this.onChange}
-                value={forehand}
+                value={forehand || "-"}
               >
                 <option value="-">-</option>
                 <option value="RIGHT">Praworęczny</option>
@@ -141,7 +141,7 @@ export class TennisProfile extends Component {
                 name="backhand"
                 className="form-control"
                 onChange={this.onChange}
-                value={backhand}
+                value={backhand || "-"}
               >
                 <option value="-">-</option>
                 <option value="ONE">Jednoręczny</option>
