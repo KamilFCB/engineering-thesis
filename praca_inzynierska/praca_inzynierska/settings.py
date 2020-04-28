@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'knox',
     'accounts.apps.AccountsConfig',
     'frontend',
+    'tournaments.apps.TournamentsConfig'
 ]
 
 REST_FRAMEWORK = {
