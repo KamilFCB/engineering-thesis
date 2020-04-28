@@ -69,9 +69,18 @@ export class Header extends Component {
           </button>
 
           <div className="collapse navbar-collapse" id="navbarColor02">
-            <Link to="/" className="nav-link">
-              Strona główna
-            </Link>
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <Link to="/" className="nav-link">
+                  Strona główna
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/create_tournament" className="nav-link">
+                  Utwórz turniej
+                </Link>
+              </li>
+            </ul>
           </div>
           {isAuthenticated ? userLinks : guestLinks}
         </div>

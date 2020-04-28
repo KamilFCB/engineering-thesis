@@ -12,6 +12,7 @@ import MainPage from "./layout/MainPage";
 import Login from "./accounts/Login";
 import Profile from "./accounts/Profile";
 import Register from "./accounts/Register";
+import CreateTournament from "./tournaments/CreateTournament";
 import PrivateRoute from "./common/PrivateRoute";
 import { loadUser } from "../actions/auth";
 
@@ -41,6 +42,11 @@ class App extends React.Component {
                   <Route exact path="/register" component={Register} />
                   <Route exact path="/login" component={Login} />
                   <PrivateRoute exact path="/profile" component={Profile} />
+                  <PrivateRoute
+                    exact
+                    path="/create_tournament"
+                    component={CreateTournament}
+                  />
                 </Switch>
               </div>
               <Alert />
