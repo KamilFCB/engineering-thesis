@@ -11,3 +11,8 @@ class Tournament(models.Model):
     draw_size = models.PositiveSmallIntegerField()
     description = models.TextField()
     organizer = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class Participation(models.Model):
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
