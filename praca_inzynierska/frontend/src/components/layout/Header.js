@@ -76,6 +76,11 @@ export class Header extends Component {
                 </Link>
               </li>
               <li className="nav-item">
+                <Link to="/tournaments" className="nav-link">
+                  Turnieje
+                </Link>
+              </li>
+              <li className="nav-item">
                 <Link to="/create_tournament" className="nav-link">
                   Utwórz turniej
                 </Link>
