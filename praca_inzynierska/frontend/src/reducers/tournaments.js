@@ -1,6 +1,10 @@
 import {
   GET_INCOMING_TOURNAMENTS,
+  GET_HISTORY_TOURNAMENTS,
+  JOIN_TOURNAMENT,
+  LEAVE_TOURNAMENT,
 } from "../actions/types";
+
 const initialState = {
   isLoading: true,
   incomingTournaments: [],
@@ -14,6 +18,16 @@ export default function (state = initialState, action) {
         ...state,
         isLoading: false,
         incomingTournaments: action.payload.tournaments,
+        hasMore: action.payload.hasMore,
+        nextPage: action.payload.nextPage,
+        join: false,
+        leave: false,
+      };
+    case GET_HISTORY_TOURNAMENTS:
+      return {
+        ...state,
+        isLoading: false,
+        historyTournaments: action.payload.tournaments,
         hasMore: action.payload.hasMore,
         nextPage: action.payload.nextPage,
         join: false,

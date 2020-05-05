@@ -1,6 +1,7 @@
 import axios from "axios";
 import {
   GET_INCOMING_TOURNAMENTS,
+  GET_HISTORY_TOURNAMENTS,
   JOIN_TOURNAMENT,
   LEAVE_TOURNAMENT,
 } from "./types";
@@ -16,6 +17,29 @@ export const getIncomingTournamentsPage = (pageNumber) => (
     .then((res) => {
       dispatch({
         type: GET_INCOMING_TOURNAMENTS,
+        payload: res.data,
+      });
+    })
+    .catch((err) => {
+      dispatch(
+        createMessage({
+          getTournamentsError:
+            "Nie udało się pobrać listy turniejów, spróbuj ponownie za chwilę",
+        })
+      );
+    });
+};
+
+export const getHistoryTournamentsPage = (pageNumber) => (
+  dispatch,
+  getState
+) => {
+  const config = setupToken(getState);
+  axios
+    .get(`/api/tournaments/history/page/${pageNumber}`, config)
+    .then((res) => {
+      dispatch({
+        type: GET_HISTORY_TOURNAMENTS,
         payload: res.data,
       });
     })
