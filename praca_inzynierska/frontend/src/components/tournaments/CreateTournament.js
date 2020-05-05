@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { createTournament } from "../../actions/tournament";
+import { createTournament } from "../../actions/tournaments";
 
 export class CreateTournament extends Component {
   state = {
