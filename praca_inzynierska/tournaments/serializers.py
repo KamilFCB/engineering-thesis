@@ -6,16 +6,20 @@ import math
 class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
-        fields = ('id', 'name', 'city', 'address', 'date', 'draw_size', 'description')
+        fields = ('id', 'name', 'city', 'address',
+                  'date', 'draw_size', 'description')
 
     def validate(self, data):
-        if math.log2(data['draw_size']).is_integer() and data['draw_size'] <= 64 and data['draw_size'] > 0:
-            if data['address'].split(" ").pop().isnumeric() and len(data['address'].split(" ")) > 1:
+        if math.log2(data['draw_size']).is_integer() and \
+           data['draw_size'] <= 64 and data['draw_size'] > 0:
+            if data['address'].split(" ").pop().isnumeric() and \
+               len(data['address'].split(" ")) > 1:
                 return data
             else:
                 raise serializers.ValidationError("Błędny adres")
         else:
-            raise serializers.ValidationError("Rozmiar drabinki turniejowej musi być potęgą dwójki oraz dodatnią liczbą nie większą niż 64")
+            raise serializers.ValidationError("Rozmiar drabinki turniejowej musi \
+                 być potęgą dwójki oraz dodatnią liczbą nie większą niż 64")
 
     def update(self, instance, validated_data):
         instance.name = validated_data['name']
@@ -26,3 +30,19 @@ class TournamentSerializer(serializers.ModelSerializer):
         instance.description = validated_data['description']
         instance.save()
         return instance
+
+
+class TournamentsPageSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = Tournament
+        fields = ('id', 'name', 'city', 'date', 'draw_size', 'participate')
+
+    def to_representation(self, instance):
+        return {
+            'id': instance.id,
+            'name': instance.name,
+            'city': instance.city,
+            'date': instance.date,
+            'draw_size': instance.draw_size,
+            'participate': False
+        }
