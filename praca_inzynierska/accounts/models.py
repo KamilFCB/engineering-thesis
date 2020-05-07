@@ -26,5 +26,7 @@ class TennisProfile(models.Model):
     birth_date = models.DateField(blank=True, null=True)
     weight = models.PositiveSmallIntegerField(blank=True, null=True)
     height = models.PositiveSmallIntegerField(blank=True, null=True)
-    forehand = models.CharField(max_length=10, choices=FOREHAND_TYPE, blank=True, null=True)
-    backhand = models.CharField(max_length=10, choices=BACKHAND_TYPE, blank=True, null=True)
+    forehand = models.CharField(max_length=10, choices=FOREHAND_TYPE,
+                                blank=True, null=True)
+    backhand = models.CharField(max_length=10, choices=BACKHAND_TYPE,
+                                blank=True, null=True)
