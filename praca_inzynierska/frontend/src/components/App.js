@@ -40,13 +40,13 @@ class App extends React.Component {
               <div className="container">
                 <Switch>
                   <Route exact path="/" component={MainPage} />
-                  <Route exact path="/register" component={Register} />
-                  <Route exact path="/login" component={Login} />
-                  <Route exact path="/tournaments" component={Tournaments} />
-                  <PrivateRoute exact path="/profile" component={Profile} />
+                  <Route exact path="/rejestracja" component={Register} />
+                  <Route exact path="/logowanie" component={Login} />
+                  <Route exact path="/turnieje" component={Tournaments} />
+                  <PrivateRoute exact path="/profil" component={Profile} />
                   <PrivateRoute
                     exact
-                    path="/create_tournament"
+                    path="/utworz_turniej"
                     component={CreateTournament}
                   />
                 </Switch>

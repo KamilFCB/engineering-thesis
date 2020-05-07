@@ -26,7 +26,7 @@ export class Header extends Component {
             {user ? `${user.username}` : ""}
           </a>
           <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-            <Link to="/profile" className="dropdown-item">
+            <Link to="/profil" className="dropdown-item">
               Profil
             </Link>
             <div className="dropdown-divider"></div>
@@ -41,12 +41,12 @@ export class Header extends Component {
     const guestLinks = (
       <ul className="navbar-nav mr-auto">
         <li className="nav-item">
-          <Link to="/register" className="nav-link">
+          <Link to="/rejestracja" className="nav-link">
             Utwórz konto
           </Link>
         </li>
         <li className="nav-item">
-          <Link to="/login" className="nav-link">
+          <Link to="/logowanie" className="nav-link">
             Zaloguj się
           </Link>
         </li>
@@ -76,12 +76,12 @@ export class Header extends Component {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/tournaments" className="nav-link">
+                <Link to="/turnieje" className="nav-link">
                   Turnieje
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/create_tournament" className="nav-link">
+                <Link to="/utworz_turniej" className="nav-link">
                   Utwórz turniej
                 </Link>
               </li>

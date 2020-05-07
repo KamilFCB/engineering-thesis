@@ -95,7 +95,7 @@ export class Register extends Component {
             </button>
           </div>
           <p>
-            Masz już konto? <Link to="/login">Zaloguj się</Link>
+            Masz już konto? <Link to="/logowanie">Zaloguj się</Link>
           </p>
         </form>
       </div>
