@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Tournament
 import math
+import datetime
 
 
 class TournamentSerializer(serializers.ModelSerializer):
@@ -10,16 +11,22 @@ class TournamentSerializer(serializers.ModelSerializer):
                   'date', 'draw_size', 'description')
 
     def validate(self, data):
-        if math.log2(data['draw_size']).is_integer() and \
-           data['draw_size'] <= 64 and data['draw_size'] > 0:
-            if data['address'].split(" ").pop().isnumeric() and \
-               len(data['address'].split(" ")) > 1:
-                return data
-            else:
-                raise serializers.ValidationError("Błędny adres")
-        else:
+        if not math.log2(data['draw_size']).is_integer() or \
+           data['draw_size'] > 64 or data['draw_size'] < 0:
             raise serializers.ValidationError("Rozmiar drabinki turniejowej musi \
                  być potęgą dwójki oraz dodatnią liczbą nie większą niż 64")
+
+        if not data['address'].split(" ").pop().isnumeric() or \
+           len(data['address'].split(" ")) <= 1:
+            raise serializers.ValidationError("Błędny adres")
+
+        actual_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        given_date = data['date'].strftime("%Y-%m-%d")
+        if actual_date >= given_date:
+            raise serializers.ValidationError("Błędna data, turniej musi odbyć \
+                                               się w przyszłości")
+
+        return data
 
     def update(self, instance, validated_data):
         instance.name = validated_data['name']
