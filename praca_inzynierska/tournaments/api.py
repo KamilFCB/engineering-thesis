@@ -93,7 +93,12 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
     serializer_class = TournamentsPageSerializer
 
     def post(self, request, *args, **kwargs):
-        tournament = Tournament.objects.get(id=request.data['tournament'])
+        try:
+            tournament = Tournament.objects.get(id=request.data['tournament'])
+        except Tournament.DoesNotExist:
+            return Response({
+                "message": "Taki turniej nie istnieje"
+            }, status=400)
         if tournament.date < datetime.now().date():
             return Response({
                 "message": "Zapisy zostały zakończone"
@@ -124,9 +129,9 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
             user = self.request.user
             participation = Participation.objects.get(tournament=tournament,
                                                       player=user)
-            if tournament.date < datetime.now().date():
+            if tournament.date <= datetime.now().date():
                 return Response({
-                    "message": "Nie możesz wypisać się z tego turnieju"
+                    "message": "Czas wypisów z tego turneju już minął"
                 }, status=406)
 
             participation.delete()
