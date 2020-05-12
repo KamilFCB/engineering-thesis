@@ -178,6 +178,8 @@ class AccountBackendTests(APITestCase):
 
 
 class AccountFrontendTests(LiveServerTestCase):
+    __url = "http://127.0.0.1:8000/#/"
+
     def setUp(self):
         self.driver = webdriver.Chrome()
 
@@ -185,7 +187,7 @@ class AccountFrontendTests(LiveServerTestCase):
         self.driver.close()
 
     def test_login_correct(self):
-        url = "http://127.0.0.1:8000/#/login"
+        url = self.__url + "logowanie"
         self.driver.get(url)
         username = self.driver.find_element_by_name("username")
         password = self.driver.find_element_by_name("password")
@@ -199,7 +201,7 @@ class AccountFrontendTests(LiveServerTestCase):
         self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/#/")
 
     def test_login_incorrect(self):
-        url = "http://127.0.0.1:8000/#/login"
+        url = self.__url + "logowanie"
         self.driver.get(url)
         username = self.driver.find_element_by_name("username")
         password = self.driver.find_element_by_name("password")
@@ -215,7 +217,7 @@ class AccountFrontendTests(LiveServerTestCase):
             pass
 
     def test_register_with_existing_username(self):
-        url = "http://127.0.0.1:8000/#/register"
+        url = self.__url + "rejestracja"
         self.driver.get(url)
         username = self.driver.find_element_by_name("username")
         password = self.driver.find_element_by_name("password")
@@ -233,15 +235,15 @@ class AccountFrontendTests(LiveServerTestCase):
             pass
 
     def test_profile_manage_without_login(self):
-        url = "http://127.0.0.1:8000/#/"
+        url = self.__url
         self.driver.get(url)
         self.assertEqual(self.driver.current_url, url)
-        url = "http://127.0.0.1:8000/#/profile"
+        url = self.__url + "profil"
         self.driver.get(url)
-        self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/#/login")
+        self.assertEqual(self.driver.current_url, self.__url + "logowanie")
 
     def test_update_user_profile(self):
-        url = "http://127.0.0.1:8000/#/login"
+        url = self.__url + "logowanie"
         self.driver.get(url)
         username = self.driver.find_element_by_name("username")
         password = self.driver.find_element_by_name("password")
@@ -252,7 +254,7 @@ class AccountFrontendTests(LiveServerTestCase):
         submit.send_keys(Keys.RETURN)
         wait = WebDriverWait(self.driver, 2)
         wait.until(url_changes(url))
-        url = "http://127.0.0.1:8000/#/profile"
+        url = self.__url + "profil"
         self.driver.get(url)
         self.assertEqual(self.driver.current_url, url)
         self.driver.implicitly_wait(2)
@@ -272,7 +274,7 @@ class AccountFrontendTests(LiveServerTestCase):
                                     .get_attribute('value'), "Kowalski")
 
     def test_update_tennis_profile(self):
-        url = "http://127.0.0.1:8000/#/login"
+        url = self.__url + "logowanie"
         self.driver.get(url)
         username = self.driver.find_element_by_name("username")
         password = self.driver.find_element_by_name("password")
@@ -283,7 +285,7 @@ class AccountFrontendTests(LiveServerTestCase):
         submit.send_keys(Keys.RETURN)
         wait = WebDriverWait(self.driver, 2)
         wait.until(url_changes(url))
-        url = "http://127.0.0.1:8000/#/profile"
+        url = self.__url + "profil"
         self.driver.get(url)
         self.assertEqual(self.driver.current_url, url)
         self.driver.implicitly_wait(2)
