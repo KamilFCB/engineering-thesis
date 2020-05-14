@@ -130,7 +130,7 @@ export class IncomingTournaments extends Component {
                 {tournaments.map((tournament) => (
                   <tr key={tournament.id}>
                     <td>
-                      <Link to={"/tournament/" + tournament.id}>
+                      <Link to={"/turniej/" + tournament.id}>
                         {tournament.name}
                       </Link>
                     </td>
