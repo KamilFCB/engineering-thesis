@@ -27,11 +27,17 @@ class CreateTournamentAPI(generics.GenericAPIView):
 
 class TournamentAPI(generics.ListAPIView):
     serializer_class = TournamentSerializer
-    queryset = Tournament.objects.order_by('-id')
 
-    def get_object(self):
-        serializer = self.get_serializer(self.queryset)
-        return serializer.data
+    def get(self, request, *args, **kwargs):
+        try:
+            tournament = Tournament.objects.get(pk=kwargs['tournament_id'])
+        except Tournament.DoesNotExist:
+            return Response({
+                "message": "Taki turniej nie istnieje"
+            }, status=400)
+
+        serializer = self.get_serializer(tournament)
+        return Response(serializer.data)
 
 
 class IncomingTournamentsPageAPI(generics.ListAPIView):
