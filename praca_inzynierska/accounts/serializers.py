@@ -56,3 +56,9 @@ class TennisProfileSerializer(serializers.ModelSerializer):
         instance.backhand = validated_data['backhand']
         instance.save()
         return instance
+
+
+class TournamentParticipantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name')

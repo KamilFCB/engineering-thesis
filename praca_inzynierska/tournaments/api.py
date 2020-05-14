@@ -4,6 +4,7 @@ from .serializers import TournamentSerializer, TournamentsPageSerializer
 from .models import Tournament, Participation
 from django.core.paginator import Paginator
 from django.utils.datetime_safe import datetime
+from accounts.serializers import TournamentParticipantSerializer
 
 
 class CreateTournamentAPI(generics.GenericAPIView):
@@ -144,3 +145,23 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
             return Response({
                 "message": "Nie byłeś zapisany do tego turnieju"
             }, status=406)
+
+
+class TournamentParticipants(generics.ListAPIView):
+    serializer_class = TournamentParticipantSerializer
+
+    def get(self, request, *args, **kwargs):
+        tournament_id = kwargs['tournament_id']
+        try:
+            tournament = Tournament.objects.get(pk=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({
+                "message": "Taki turniej nie istnieje"
+            }, status=400)
+        else:
+            tournament_participants = Participation.objects.filter(tournament=tournament)
+            participants_profiles = [self.get_serializer(participant.player).data
+                                     for participant in tournament_participants]
+            return Response({
+                "participants": participants_profiles
+            })
