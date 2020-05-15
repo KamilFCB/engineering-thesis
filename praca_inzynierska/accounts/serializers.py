@@ -89,3 +89,22 @@ class TournamentParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name')
+
+
+class PlayerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TennisProfile
+        fields = ('residence', 'birth_date', 'weight', 'height', 'forehand',
+                  'backhand', 'first_name', 'last_name')
+
+    def to_representation(self, instance):
+        return {
+            'residence': instance.residence,
+            'birth_date': instance.birth_date,
+            'weight': instance.weight,
+            'height': instance.height,
+            'forehand': instance.forehand,
+            'backhand': instance.backhand,
+            'first_name': "",
+            'last_name': "",
+        }

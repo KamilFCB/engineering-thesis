@@ -2,9 +2,11 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
 from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer,
-                          UserProfileSerializer, TennisProfileSerializer)
+                          UserProfileSerializer, TennisProfileSerializer,
+                          PlayerProfileSerializer)
 from django.http import JsonResponse
 from .models import TennisProfile
+from django.contrib.auth.models import User
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -79,9 +81,24 @@ class TennisProfileAPI(generics.RetrieveUpdateAPIView):
 
     def put(self, request, *args, **kwargs):
         if self.request.data['birth_date'] == "":
-        self.request.data['birth_date'] = None
+            self.request.data['birth_date'] = None
         profile = TennisProfile.objects.get(user_id=self.request.user)
         serializer = self.get_serializer(profile, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return JsonResponse(serializer.data)
+
+
+class PlayerProfileAPI(generics.RetrieveAPIView):
+    serializer_class = PlayerProfileSerializer
+
+    def get(self, request, *args, **kwargs):
+        player_id = kwargs['player_id']
+        tennis_profile = TennisProfile.objects.get(user_id=player_id)
+        user_profile = User.objects.get(pk=player_id)
+        serializer = self.get_serializer(tennis_profile)
+        player_profile = serializer.data
+        player_profile['first_name'] = user_profile.first_name
+        player_profile['last_name'] = user_profile.last_name
+
+        return JsonResponse(player_profile)
