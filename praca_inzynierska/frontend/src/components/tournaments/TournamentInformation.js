@@ -53,7 +53,7 @@ export class TournamentInformation extends Component {
     const page = (
       <div className="tab-pane fade active show" id="information">
         <div className="card card-body">
-          <table className="table table-striped table-dark">
+          <table className="table table-striped table-dark table-bordered text-center">
             <thead>
               <tr>
                 <th scope="col">Nazwa turnieju</th>

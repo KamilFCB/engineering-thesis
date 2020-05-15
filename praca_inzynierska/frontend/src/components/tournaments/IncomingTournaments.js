@@ -116,7 +116,7 @@ export class IncomingTournaments extends Component {
             hasMore={this.state.hasMore}
             loader={spinner}
           >
-            <table className="table table-striped table-dark table-bordered">
+            <table className="table table-striped table-dark table-bordered text-center">
               <thead>
                 <tr>
                   <th scope="col">Nazwa turnieju</th>
