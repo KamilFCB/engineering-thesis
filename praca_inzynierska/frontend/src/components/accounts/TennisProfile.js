@@ -131,8 +131,8 @@ export class TennisProfile extends Component {
                 value={forehand || "-"}
               >
                 <option value="-">-</option>
-                <option value="RIGHT">Praworęczny</option>
-                <option value="LEFT">Leworęczny</option>
+                <option value="Praworęczny">Praworęczny</option>
+                <option value="Leworęczny">Leworęczny</option>
               </select>
             </div>
             <div className="form-group">
@@ -144,8 +144,8 @@ export class TennisProfile extends Component {
                 value={backhand || "-"}
               >
                 <option value="-">-</option>
-                <option value="ONE">Jednoręczny</option>
-                <option value="TWO">Dwuręczny</option>
+                <option value="Jednoręczny">Jednoręczny</option>
+                <option value="Dwuręczny">Dwuręczny</option>
               </select>
             </div>
             <div className="form-group">

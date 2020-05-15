@@ -4,11 +4,11 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class TennisProfile(models.Model):
-    LEFT_HANDED = 'LEFT'
-    RIGHT_HANDED = 'RIGHT'
+    LEFT_HANDED = 'Leworęczny'
+    RIGHT_HANDED = 'Praworęczny'
     DEFAULT = '-'
-    ONE_HANDED = 'ONE'
-    TWO_HANDED = 'TWO'
+    ONE_HANDED = 'Jednoręczny'
+    TWO_HANDED = 'Dwuręczny'
 
     FOREHAND_TYPE = [
         (LEFT_HANDED, 'Leworęczny'),
@@ -26,7 +26,7 @@ class TennisProfile(models.Model):
     birth_date = models.DateField(blank=True, null=True)
     weight = models.PositiveSmallIntegerField(blank=True, null=True)
     height = models.PositiveSmallIntegerField(blank=True, null=True)
-    forehand = models.CharField(max_length=10, choices=FOREHAND_TYPE,
+    forehand = models.CharField(max_length=20, choices=FOREHAND_TYPE,
                                 blank=True, null=True)
-    backhand = models.CharField(max_length=10, choices=BACKHAND_TYPE,
+    backhand = models.CharField(max_length=20, choices=BACKHAND_TYPE,
                                 blank=True, null=True)
