@@ -78,6 +78,7 @@ class TennisProfileAPI(generics.RetrieveUpdateAPIView):
         return serializer.data
 
     def put(self, request, *args, **kwargs):
+        if self.request.data['birth_date'] == "":
         self.request.data['birth_date'] = None
         profile = TennisProfile.objects.get(user_id=self.request.user)
         serializer = self.get_serializer(profile, data=request.data)
