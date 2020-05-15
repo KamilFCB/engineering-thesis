@@ -11,6 +11,7 @@ import Alert from "./layout/Alert";
 import MainPage from "./layout/MainPage";
 import Login from "./accounts/Login";
 import Profile from "./accounts/Profile";
+import PlayerProfile from "./accounts/PlayerProfile";
 import Register from "./accounts/Register";
 import CreateTournament from "./tournaments/CreateTournament";
 import Tournaments from "./tournaments/Tournaments";
@@ -19,8 +20,7 @@ import PrivateRoute from "./common/PrivateRoute";
 import { loadUser } from "../actions/auth";
 
 class App extends React.Component {
-  // alert options
-  options = {
+  alertOptions = {
     position: positions.TOP_CENTER,
     timeout: 4000,
     offset: "5px",
@@ -34,7 +34,7 @@ class App extends React.Component {
   render() {
     return (
       <Provider store={store}>
-        <AlertProvider template={AlertTemplate} {...this.options}>
+        <AlertProvider template={AlertTemplate} {...this.alertOptions}>
           <HashRouter>
             <Fragment>
               <Header />
@@ -50,6 +50,7 @@ class App extends React.Component {
                     path="/utworz_turniej"
                     component={CreateTournament}
                   />
+                  <Route exact path="/gracz/:id" component={PlayerProfile} />
                   <Route exact path="/turniej/:id" component={Tournament} />
                 </Switch>
               </div>
