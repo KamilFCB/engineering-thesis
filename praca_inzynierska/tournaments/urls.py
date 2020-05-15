@@ -13,5 +13,6 @@ urlpatterns = [
           HistoryTournamentsPageAPI.as_view()),
      path('api/tournament/participate',
           ParticipateTournamentAPI.as_view()),
-     path('api/tournament/participants/<int:tournament_id>', TournamentParticipants.as_view()),
+     path('api/tournament/participants/<int:tournament_id>',
+          TournamentParticipants.as_view()),
 ]

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from .models import TennisProfile
+import re
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -21,6 +22,19 @@ class RegisterSerializer(serializers.ModelSerializer):
                                         validated_data['email'],
                                         validated_data['password'])
         return user
+
+    def validate(self, data):
+        first_name = data['first_name']
+        last_name = data['last_name']
+
+        if re.match("[A-Z][a-z]+", first_name) is None:
+            raise serializers.ValidationError("Imię musi rozpoczynać się wielką \
+                                              literą i posiadać co najmniej dwie litery")
+        if re.match("[A-Z][a-z]+", last_name) is None:
+            raise serializers.ValidationError("Nazwisko musi rozpoczynać się wielką \
+                                              literą i posiadać co najmniej dwie litery")
+
+        return data
 
 
 class LoginSerializer(serializers.Serializer):
@@ -39,6 +53,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
+
+    def validate(self, data):
+        first_name = data['first_name']
+        last_name = data['last_name']
+
+        if re.match("[A-Z][a-z]+", first_name) is None:
+            raise serializers.ValidationError("Imię musi rozpoczynać się wielką \
+                                              literą i posiadać co najmniej dwie litery")
+        if re.match("[A-Z][a-z]+", last_name) is None:
+            raise serializers.ValidationError("Nazwisko musi rozpoczynać się wielką \
+                                              literą i posiadać co najmniej dwie litery")
+
+        return data
 
 
 class TennisProfileSerializer(serializers.ModelSerializer):

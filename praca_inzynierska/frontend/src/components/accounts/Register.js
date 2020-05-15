@@ -7,6 +7,8 @@ import { register } from "../../actions/auth";
 export class Register extends Component {
   state = {
     username: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     password2: "",
@@ -19,13 +21,22 @@ export class Register extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
-    const { username, email, password, password2 } = this.state;
+    const {
+      username,
+      firstName,
+      lastName,
+      email,
+      password,
+      password2,
+    } = this.state;
     if (password !== password2) {
       // TODO
       console.log("error");
     } else {
       const newUser = {
         username,
+        firstName,
+        lastName,
         email,
         password,
       };
@@ -43,7 +54,14 @@ export class Register extends Component {
       return <Redirect to="/" />;
     }
 
-    const { username, email, password, password2 } = this.state;
+    const {
+      username,
+      firstName,
+      lastName,
+      email,
+      password,
+      password2,
+    } = this.state;
 
     return (
       <div className="card card-body">
@@ -57,6 +75,26 @@ export class Register extends Component {
               name="username"
               onChange={this.onChange}
               value={username}
+            />
+          </div>
+          <div className="form-group">
+            <label>Imię</label>
+            <input
+              className="form-control"
+              type="text"
+              name="firstName"
+              onChange={this.onChange}
+              value={firstName}
+            />
+          </div>
+          <div className="form-group">
+            <label>Nazwisko</label>
+            <input
+              className="form-control"
+              type="text"
+              name="lastName"
+              onChange={this.onChange}
+              value={lastName}
             />
           </div>
           <div className="form-group">

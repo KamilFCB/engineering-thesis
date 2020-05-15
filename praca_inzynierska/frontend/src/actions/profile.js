@@ -5,6 +5,7 @@ import {
   USER_PROFILE_LOADED,
   TENNIS_PROFILE_LOADING,
   TENNIS_PROFILE_LOADED,
+  GET_ERRORS,
 } from "../actions/types";
 import { createMessage } from "../actions/messages";
 
@@ -52,11 +53,14 @@ export const updateUserProfile = ({
       );
     })
     .catch((err) => {
-      dispatch(
-        createMessage({
-          updateError: "Nie udało się zaktualizować profilu, spróbuj ponownie",
-        })
-      );
+      const error = {
+        message: err.response.data,
+        status: err.response.status,
+      };
+      dispatch({
+        type: GET_ERRORS,
+        payload: error,
+      });
     });
 };
 

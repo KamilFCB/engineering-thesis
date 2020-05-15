@@ -89,14 +89,26 @@ export const logout = () => (dispatch, getState) => {
     });
 };
 
-export const register = ({ username, email, password }) => (dispatch) => {
+export const register = ({
+  username,
+  firstName,
+  lastName,
+  email,
+  password,
+}) => (dispatch) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
   };
 
-  const bodyRequest = JSON.stringify({ username, email, password });
+  const bodyRequest = JSON.stringify({
+    username,
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    password,
+  });
 
   axios
     .post("/api/auth/register", bodyRequest, config)
@@ -108,7 +120,6 @@ export const register = ({ username, email, password }) => (dispatch) => {
       });
     })
     .catch((err) => {
-      console.log(err.response.data);
       const error = {
         message: err.response.data,
         status: err.response.status,
