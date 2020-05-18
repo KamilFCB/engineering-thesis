@@ -1,10 +1,12 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from .serializers import TournamentSerializer, TournamentsPageSerializer
-from .models import Tournament, Participation
+from .serializers import (TournamentSerializer, TournamentsPageSerializer,
+                          TournamentMatchSerializer)
+from .models import Tournament, Participation, Match
 from django.core.paginator import Paginator
 from django.utils.datetime_safe import datetime
 from accounts.serializers import TournamentParticipantSerializer
+from .utils import prepare_match_data, reverse_score
 
 
 class CreateTournamentAPI(generics.GenericAPIView):
@@ -171,3 +173,24 @@ class TournamentParticipants(generics.ListAPIView):
             return Response({
                 "participants": participants_profiles
             })
+
+
+class TournamentMatches(generics.ListAPIView):
+    serializer_class = TournamentMatchSerializer
+
+    def get(self, request, *args, **kwargs):
+        tournament_id = kwargs['tournament_id']
+        try:
+            matches = Match.objects.filter(tournament_id=tournament_id).order_by("round")
+        except Match.DoesNotExist:
+            return Response({
+                "message": "Brak meczów"
+            }, status=406)
+        else:
+            matches_serializer = [prepare_match_data(self.get_serializer(match).data)
+                                  for match in matches]
+
+            return Response({
+                "matches": matches_serializer
+            })
+

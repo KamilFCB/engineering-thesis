@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tournament
+from .models import Tournament, Match
 import math
 import datetime
 
@@ -53,3 +53,15 @@ class TournamentsPageSerializer(serializers.BaseSerializer):
             'draw_size': instance.draw_size,
             'participate': False
         }
+
+
+class TournamentNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tournament
+        fields = ('id', 'name')
+
+
+class TournamentMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        fields = ('id', 'player1', 'player2', 'tournament', 'date', 'round', 'score')

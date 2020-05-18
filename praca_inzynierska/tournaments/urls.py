@@ -1,7 +1,8 @@
 from django.urls import path
 from .api import (CreateTournamentAPI, TournamentAPI,
                   IncomingTournamentsPageAPI, ParticipateTournamentAPI,
-                  HistoryTournamentsPageAPI, TournamentParticipants)
+                  HistoryTournamentsPageAPI, TournamentParticipants,
+                  TournamentMatches, TournamentMatch, PlayerMatches)
 
 
 urlpatterns = [
@@ -15,4 +16,8 @@ urlpatterns = [
           ParticipateTournamentAPI.as_view()),
      path('api/tournament/participants/<int:tournament_id>',
           TournamentParticipants.as_view()),
+     path('api/tournament/<int:tournament_id>/matches', TournamentMatches.as_view()),
+     path('api/tournament/<int:tournament_id>/match/<int:match_id>',
+          TournamentMatch.as_view()),
+     path('api/player/<int:player_id>/matches', PlayerMatches.as_view())
 ]
