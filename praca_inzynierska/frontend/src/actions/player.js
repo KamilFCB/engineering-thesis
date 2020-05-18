@@ -13,7 +13,7 @@ export const getPlayerInformations = (playerId) => (dispatch, getState) => {
     .catch((err) => {
       dispatch(
         createMessage({
-          profileLoadError: "Nie udało się załadować profilu, spróbuj ponownie",
+          profileLoadError: err.response.data.message,
         })
       );
     });

@@ -94,7 +94,12 @@ class PlayerProfileAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         player_id = kwargs['player_id']
-        tennis_profile = TennisProfile.objects.get(user_id=player_id)
+        try:
+            tennis_profile = TennisProfile.objects.get(user_id=player_id)
+        except TennisProfile.DoesNotExist:
+            return Response({
+                "message": "Nie ma takiego gracza"
+            }, status=406)
         user_profile = User.objects.get(pk=player_id)
         serializer = self.get_serializer(tennis_profile)
         player_profile = serializer.data
