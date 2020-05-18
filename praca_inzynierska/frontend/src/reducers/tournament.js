@@ -1,12 +1,14 @@
 import {
   GET_TOURNAMENT_PARTICIPANTS,
   GET_TOURNAMENT_INFORMATIONS,
+  GET_TOURNAMENT_MATCHES,
 } from "../actions/types";
 
 const initialState = {
   participants: null,
   isLoading: true,
   informations: null,
+  matches: null,
 };
 
 export default function (state = initialState, action) {
@@ -22,6 +24,12 @@ export default function (state = initialState, action) {
         ...state,
         isLoading: false,
         informations: action.payload,
+      };
+    case GET_TOURNAMENT_MATCHES:
+      return {
+        ...state,
+        isLoading: false,
+        matches: action.payload,
       };
     default:
       return state;
