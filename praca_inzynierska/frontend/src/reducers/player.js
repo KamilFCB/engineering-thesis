@@ -1,9 +1,10 @@
-import { GET_PLAYER_PROFILE } from "../actions/types";
+import { GET_PLAYER_PROFILE, GET_PLAYER_MATCHES } from "../actions/types";
 
 const initialState = {
   profile: null,
   matches: null,
-  isLoading: true,
+  isLoadingProfile: true,
+  isLoadingMatches: true,
 };
 
 export default function (state = initialState, action) {
@@ -12,7 +13,13 @@ export default function (state = initialState, action) {
       return {
         ...state,
         profile: action.payload,
-        isLoading: false,
+        isLoadingProfile: false,
+      };
+    case GET_PLAYER_MATCHES:
+      return {
+        ...state,
+        matches: action.payload,
+        isLoadingMatches: false,
       };
     default:
       return state;
