@@ -6,6 +6,7 @@ from .models import Tournament, Participation, Match
 from django.core.paginator import Paginator
 from django.utils.datetime_safe import datetime
 from accounts.serializers import TournamentParticipantSerializer
+from django.db.models import Q
 from .utils import prepare_match_data, reverse_score
 
 
@@ -194,3 +195,28 @@ class TournamentMatches(generics.ListAPIView):
                 "matches": matches_serializer
             })
 
+
+class PlayerMatches(generics.ListAPIView):
+    serializer_class = TournamentMatchSerializer
+
+    def get(self, request, *args, **kwargs):
+        player_id = kwargs['player_id']
+        try:
+            matches = (Match.objects.filter(Q(player1_id=player_id) | Q(player2_id=player_id))
+                                    .order_by('-date'))[:10]
+        except User.DoesNotExist:
+            return Response({
+                "message": "Nie ma takiego gracza"
+            }, status=406)
+        else:
+            matches_serializer = [prepare_match_data(self.get_serializer(match).data)
+                                  for match in matches]
+
+            for match in matches_serializer:
+                if player_id != match["player1"]["id"]:
+                    match["player1"], match["player2"] = match["player2"], match["player1"]
+                    match["score"] = reverse_score(match["score"])
+
+            return Response({
+                "matches": matches_serializer
+            })

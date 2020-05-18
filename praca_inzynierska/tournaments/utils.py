@@ -14,3 +14,11 @@ def prepare_match_data(serialized_data):
 
     return serialized_data
 
+
+def reverse_score(score):
+    sets = []
+    for set in score.split():
+        gems = set.split(":")
+        sets.append(gems[1] + ":" + gems[0])
+
+    return (" ").join(sets)
