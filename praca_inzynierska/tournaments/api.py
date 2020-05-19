@@ -200,15 +200,18 @@ class PlayerMatches(generics.ListAPIView):
     serializer_class = TournamentMatchSerializer
 
     def get(self, request, *args, **kwargs):
+        page_number = kwargs['page_number']
         player_id = kwargs['player_id']
         try:
-            matches = (Match.objects.filter(Q(player1_id=player_id) | Q(player2_id=player_id))
-                                    .order_by('-date'))[:10]
+            queryset = (Match.objects.filter(Q(player1_id=player_id) | Q(player2_id=player_id))
+                                     .order_by('-date'))
         except User.DoesNotExist:
             return Response({
                 "message": "Nie ma takiego gracza"
             }, status=406)
         else:
+            paginator = Paginator(queryset, 25)
+            matches = paginator.get_page(page_number)
             matches_serializer = [prepare_match_data(self.get_serializer(match).data)
                                   for match in matches]
 
@@ -218,5 +221,7 @@ class PlayerMatches(generics.ListAPIView):
                     match["score"] = reverse_score(match["score"])
 
             return Response({
-                "matches": matches_serializer
+                "matches": matches_serializer,
+                "hasMore": matches.has_next(),
+                "nextPage": page_number+1
             })

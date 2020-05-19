@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Spinner } from "../common/Spinner";
 import { getPlayerInformations, getPlayerMatches } from "../../actions/player";
 import { Link } from "react-router-dom";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export class PlayerProfile extends Component {
   state = {
@@ -11,6 +12,8 @@ export class PlayerProfile extends Component {
     isLoadingMatches: true,
     profile: {},
     matches: [],
+    hasMore: true,
+    nextPage: 1,
   };
 
   static propTypes = {
@@ -18,12 +21,34 @@ export class PlayerProfile extends Component {
     getPlayerMatches: PropTypes.func.isRequired,
   };
 
+  fetchMoreData = () => {
+    this.props.getPlayerMatches(
+      this.props.match.params.id,
+      this.state.nextPage
+    );
+  };
+
   componentDidMount() {
     this.props.getPlayerInformations(this.props.match.params.id);
-    this.props.getPlayerMatches(this.props.match.params.id);
+    this.props.getPlayerMatches(this.props.match.params.id, 1);
   }
 
   componentDidUpdate(prevProps) {
+    if (prevProps.match.params.id != this.props.match.params.id) {
+      this.setState(
+        {
+          isLoadingProfile: true,
+          isLoadingMatches: true,
+          nextPage: 1,
+          hasMore: true,
+          matches: [],
+        },
+        () => {
+          this.props.getPlayerMatches(this.props.match.params.id, 1);
+          this.props.getPlayerInformations(this.props.match.params.id);
+        }
+      );
+    }
     if (this.props.player != prevProps.player) {
       if (this.props.player.profile) {
         this.setState({
@@ -31,25 +56,25 @@ export class PlayerProfile extends Component {
           profile: this.props.player.profile,
         });
       }
-      if (this.props.player.matches) {
+      if (this.props.player.matches != prevProps.player.matches) {
         this.setState({
-          matches: this.props.player.matches.matches,
+          matches: this.state.matches.concat(this.props.player.matches),
           isLoadingMatches: this.props.player.isLoadingMatches,
+          nextPage: this.props.player.nextPage,
+          hasMore: this.props.player.hasMore,
         });
       }
-    }
-    if (prevProps.match.params.id != this.props.match.params.id) {
-      this.setState({
-        isLoadingProfile: true,
-        isLoadingMatches: true,
-      });
-      this.props.getPlayerInformations(this.props.match.params.id);
-      this.props.getPlayerMatches(this.props.match.params.id);
     }
   }
 
   render() {
-    const { isLoadingProfile, isLoadingMatches, profile, matches } = this.state;
+    const {
+      isLoadingProfile,
+      isLoadingMatches,
+      profile,
+      matches,
+      hasMore,
+    } = this.state;
     const spinner = <Spinner />;
     const profileComponent = (
       <div>
@@ -68,7 +93,7 @@ export class PlayerProfile extends Component {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr key={profile.id}>
               <td>{profile.residence ? profile.residence : "-"}</td>
               <td>{profile.birth_date ? profile.birth_date : "-"}</td>
               <td>{profile.height ? profile.height : "-"}</td>
@@ -82,36 +107,43 @@ export class PlayerProfile extends Component {
     );
 
     const matchesTable = (
-      <table className="table table-striped table-dark text-center">
-        <thead>
-          <tr>
-            <th scope="col">Data</th>
-            <th scope="col">Turniej</th>
-            <th scope="col">Runda</th>
-            <th scope="col">Przeciwnik</th>
-            <th scope="col">Wynik</th>
-          </tr>
-        </thead>
-        <tbody>
-          {matches.map((match) => (
-            <tr key={match.id}>
-              <td>{match.date}</td>
-              <td>
-                <Link to={"/turniej/" + match.tournament.id}>
-                  {match.tournament.name}
-                </Link>
-              </td>
-              <td>{match.round}</td>
-              <td>
-                <Link to={"/gracz/" + match.player2.id}>
-                  {match.player2.first_name} {match.player2.last_name}
-                </Link>
-              </td>
-              <td>{match.score}</td>
+      <InfiniteScroll
+        dataLength={matches.length}
+        next={this.fetchMoreData}
+        hasMore={hasMore}
+        loader={spinner}
+      >
+        <table className="table table-striped table-dark text-center">
+          <thead>
+            <tr>
+              <th scope="col">Data</th>
+              <th scope="col">Turniej</th>
+              <th scope="col">Runda</th>
+              <th scope="col">Przeciwnik</th>
+              <th scope="col">Wynik</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {matches.map((match) => (
+              <tr key={String(match.player2.id) + match.id}>
+                <td>{match.date}</td>
+                <td>
+                  <Link to={"/turniej/" + match.tournament.id}>
+                    {match.tournament.name}
+                  </Link>
+                </td>
+                <td>{match.round}</td>
+                <td>
+                  <Link to={"/gracz/" + match.player2.id}>
+                    {match.player2.first_name} {match.player2.last_name}
+                  </Link>
+                </td>
+                <td>{match.score}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </InfiniteScroll>
     );
     return (
       <div className="card card-body">

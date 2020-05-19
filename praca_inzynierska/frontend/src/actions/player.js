@@ -20,9 +20,12 @@ export const getPlayerInformations = (playerId) => (dispatch, getState) => {
     });
 };
 
-export const getPlayerMatches = (playerId) => (dispatch, getState) => {
+export const getPlayerMatches = (playerId, pageNumber) => (
+  dispatch,
+  getState
+) => {
   axios
-    .get(`/api/player/${playerId}/matches`)
+    .get(`/api/player/${playerId}/matches/${pageNumber}`)
     .then((res) => {
       dispatch({
         type: GET_PLAYER_MATCHES,

@@ -18,8 +18,10 @@ export default function (state = initialState, action) {
     case GET_PLAYER_MATCHES:
       return {
         ...state,
-        matches: action.payload,
+        matches: action.payload.matches,
         isLoadingMatches: false,
+        hasMore: action.payload.hasMore,
+        nextPage: action.payload.nextPage,
       };
     default:
       return state;

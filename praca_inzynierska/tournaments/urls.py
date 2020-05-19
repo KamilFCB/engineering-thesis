@@ -19,5 +19,5 @@ urlpatterns = [
      path('api/tournament/<int:tournament_id>/matches', TournamentMatches.as_view()),
      path('api/tournament/<int:tournament_id>/match/<int:match_id>',
           TournamentMatch.as_view()),
-     path('api/player/<int:player_id>/matches', PlayerMatches.as_view())
+     path('api/player/<int:player_id>/matches/<int:page_number>', PlayerMatches.as_view())
 ]
