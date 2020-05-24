@@ -2,6 +2,7 @@ import {
   GET_TOURNAMENT_PARTICIPANTS,
   GET_TOURNAMENT_INFORMATIONS,
   GET_TOURNAMENT_MATCHES,
+  GET_TOURNAMENT_MATCH,
 } from "../actions/types";
 
 const initialState = {
@@ -30,6 +31,11 @@ export default function (state = initialState, action) {
         ...state,
         isLoading: false,
         matches: action.payload,
+      };
+    case GET_TOURNAMENT_MATCH:
+      return {
+        isLoading: false,
+        match: action.payload,
       };
     default:
       return state;

@@ -15,6 +15,7 @@ import PlayerProfile from "./accounts/PlayerProfile";
 import Register from "./accounts/Register";
 import CreateTournament from "./tournaments/CreateTournament";
 import Tournaments from "./tournaments/Tournaments";
+import Match from "./tournaments/Match";
 import Tournament from "./tournaments/Tournament";
 import PrivateRoute from "./common/PrivateRoute";
 import { loadUser } from "../actions/auth";
@@ -52,6 +53,11 @@ class App extends React.Component {
                   />
                   <Route exact path="/gracz/:id" component={PlayerProfile} />
                   <Route exact path="/turniej/:id" component={Tournament} />
+                  <Route
+                    exact
+                    path="/turniej/:tournamentId/mecz/:matchId"
+                    component={Match}
+                  />
                 </Switch>
               </div>
               <Alert />
