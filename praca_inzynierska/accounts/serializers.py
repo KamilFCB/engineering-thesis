@@ -108,3 +108,18 @@ class PlayerProfileSerializer(serializers.ModelSerializer):
             'first_name': "",
             'last_name': "",
         }
+
+
+class PlayerMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TennisProfile
+        fields = ('residence', 'birth_date', 'first_name', 'last_name', 'id')
+
+    def to_representation(self, instance):
+        return {
+            'residence': instance.residence,
+            'birth_date': instance.birth_date,
+            'first_name': "",
+            'last_name': "",
+            'id': "",
+        }

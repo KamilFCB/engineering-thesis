@@ -5,9 +5,13 @@ from .serializers import (TournamentSerializer, TournamentsPageSerializer,
 from .models import Tournament, Participation, Match
 from django.core.paginator import Paginator
 from django.utils.datetime_safe import datetime
-from accounts.serializers import TournamentParticipantSerializer
+from accounts.serializers import TournamentParticipantSerializer, PlayerMatchSerializer
+from django.http.response import JsonResponse
 from django.db.models import Q
 from .utils import prepare_match_data, reverse_score
+from tournaments.serializers import TournamentNameSerializer
+from django.contrib.auth.models import User
+from accounts.models import TennisProfile
 
 
 class CreateTournamentAPI(generics.GenericAPIView):
@@ -194,6 +198,40 @@ class TournamentMatches(generics.ListAPIView):
             return Response({
                 "matches": matches_serializer
             })
+
+
+class TournamentMatch(generics.GenericAPIView):
+    serializer_class = TournamentMatchSerializer
+
+    def get(self, request, *args, **kwargs):
+        tournament_id = kwargs['tournament_id']
+        match_id = kwargs['match_id']
+        try:
+            match = Match.objects.get(tournament_id=tournament_id, pk=match_id)
+        except Match.DoesNotExist:
+            return Response({
+                "message": "Nie ma takiego meczu"
+            }, status=406)
+        else:
+            match_serializer = self.get_serializer(match).data
+            player1 = User.objects.get(pk=match_serializer["player1"])
+            player2 = User.objects.get(pk=match_serializer["player2"])
+            player1_tennis_profile = TennisProfile.objects.get(user=player1)
+            player2_tennis_profile = TennisProfile.objects.get(user=player2)
+            tournament = Tournament.objects.get(pk=match_serializer["tournament"])
+
+            match_serializer["tournament"] = TournamentNameSerializer(tournament).data
+            player1_tennis_serializer = PlayerMatchSerializer(player1_tennis_profile).data
+            player2_tennis_serializer = PlayerMatchSerializer(player2_tennis_profile).data
+
+            player1_tennis_serializer['first_name'] = player1.first_name
+            player1_tennis_serializer['last_name'] = player1.last_name
+            player2_tennis_serializer['first_name'] = player2.first_name
+            player2_tennis_serializer['last_name'] = player2.last_name
+
+            match_serializer["player1"] = player1_tennis_serializer
+            match_serializer["player2"] = player2_tennis_serializer
+            return JsonResponse(match_serializer)
 
 
 class PlayerMatches(generics.ListAPIView):
