@@ -28,10 +28,6 @@ export class TournamentMatches extends Component {
     }
   }
 
-  dd = (matches) => {
-    return <h3>{matches.length}</h3>;
-  };
-
   render() {
     const { isLoading, matches } = this.state;
     let round_matches = {};
@@ -64,7 +60,18 @@ export class TournamentMatches extends Component {
                           {match.player2.first_name} {match.player2.last_name}
                         </Link>
                       </td>
-                      <td>{match.score}</td>
+                      <td>
+                        <Link
+                          to={
+                            "/turniej/" +
+                            this.props.tournamentId +
+                            "/mecz/" +
+                            match.id
+                          }
+                        >
+                          {match.score}
+                        </Link>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
