@@ -29,6 +29,12 @@ export class Header extends Component {
             <Link to="/profil" className="dropdown-item">
               Profil
             </Link>
+            <Link
+              to={user ? `/gracz/${user.id}` : ""}
+              className="dropdown-item"
+            >
+              Historia meczów
+            </Link>
             <div className="dropdown-divider"></div>
             <a className="dropdown-item" onClick={this.props.logout}>
               Wyloguj
