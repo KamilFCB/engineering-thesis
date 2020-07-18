@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .serializers import (TournamentSerializer, TournamentsPageSerializer,
-                          TournamentMatchSerializer)
+                          TournamentMatchSerializer, TournamentOrganizerSerializer)
 from .models import Tournament, Participation, Match
 from django.core.paginator import Paginator
 from django.utils.datetime_safe import datetime
@@ -12,6 +12,7 @@ from .utils import prepare_match_data, reverse_score
 from tournaments.serializers import TournamentNameSerializer
 from django.contrib.auth.models import User
 from accounts.models import TennisProfile
+import random
 
 
 class CreateTournamentAPI(generics.GenericAPIView):
@@ -160,7 +161,7 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
             }, status=406)
 
 
-class TournamentParticipants(generics.ListAPIView):
+class TournamentParticipantsAPI(generics.ListAPIView):
     serializer_class = TournamentParticipantSerializer
 
     def get(self, request, *args, **kwargs):
@@ -180,7 +181,31 @@ class TournamentParticipants(generics.ListAPIView):
             })
 
 
-class TournamentMatches(generics.ListAPIView):
+class OrganizedTournamentsAPI(generics.ListAPIView):
+    serializer_class = TournamentsPageSerializer
+
+    def get(self, request, *args, **kwargs):
+        user_id = kwargs['user_id']
+        try:
+            user = User.objects.get(id=user_id)
+            tournaments = Tournament.objects.filter(organizer=user)
+        except Tournament.DoesNotExist:
+            return Response({
+                "participants": []
+            })
+        except User.DoesNotExist:
+            return Response({
+                "message": "Nie ma takiego użytkownika"
+            }, status=400)
+        else:
+            serializer_list = [self.get_serializer(tournament).data
+                               for tournament in tournaments]
+            return Response({
+                "tournaments": serializer_list
+            })
+
+
+class TournamentMatchesAPI(generics.ListAPIView):
     serializer_class = TournamentMatchSerializer
 
     def get(self, request, *args, **kwargs):
@@ -200,7 +225,24 @@ class TournamentMatches(generics.ListAPIView):
             })
 
 
-class TournamentMatch(generics.GenericAPIView):
+class TournamentOrganizerAPI(generics.ListAPIView):
+    serializer_class = TournamentOrganizerSerializer
+
+    def get(self, request, *args, **kwargs):
+        tournament_id = kwargs['tournament_id']
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({
+                "message": "Nie ma takiego turnieju"
+            }, status=406)
+        else:
+            return Response({
+                "organizer": tournament.organizer.id
+            })
+
+
+class TournamentMatchAPI(generics.GenericAPIView):
     serializer_class = TournamentMatchSerializer
 
     def get(self, request, *args, **kwargs):
@@ -234,7 +276,7 @@ class TournamentMatch(generics.GenericAPIView):
             return JsonResponse(match_serializer)
 
 
-class PlayerMatches(generics.ListAPIView):
+class PlayerMatchesAPI(generics.ListAPIView):
     serializer_class = TournamentMatchSerializer
 
     def get(self, request, *args, **kwargs):
@@ -263,3 +305,65 @@ class PlayerMatches(generics.ListAPIView):
                 "hasMore": matches.has_next(),
                 "nextPage": page_number+1
             })
+
+
+class StartTournamentAPI(generics.CreateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    def get(self, request, *args, **kwargs):
+        tournament_id = kwargs['tournament_id']
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({
+                "message": "Nie ma takiego turnieju"
+            }, status=406)
+        else:
+            user = self.request.user
+            if user != tournament.organizer:
+                return Response({
+                    "message": "Nie jesteś organizatorem turnieju"
+                }, status=403)
+            
+            if tournament.started:
+                return Response({
+                    "message": "Turniej już się rozpoczął"
+                }, status=406)
+            
+            # if tournament.date != datetime.now():
+            #     return Response({
+            #         "message": "Nie możesz jeszcze rozpocząć tego turnieju"
+            #     }, status=406)
+            
+            matches_in_round = tournament.draw_size // 2
+            round = 1
+            match_number = 1
+            participations = Participation.objects.filter(tournament=tournament)
+            participants = [participation.player for participation in participations]
+            while len(participants) < tournament.draw_size:
+                participants.append(None)
+
+            random.shuffle(participants)
+            for player1, player2 in zip(participants[0::2], participants[1::2]):
+                Match.objects.create(player1=player1, player2=player2, tournament=tournament,
+                                    round=round, match_number=match_number, date=tournament.date)
+                match_number += 1
+
+            round += 1
+            matches_in_round //= 2
+
+            while matches_in_round >= 1:
+                for i in range(matches_in_round):
+                    Match.objects.create(tournament=tournament, round=round, 
+                                         match_number=match_number, date=tournament.date)
+                    match_number += 1
+                round += 1
+                matches_in_round //= 2
+
+            tournament.started = True
+            tournament.save()
+            return Response({
+                "message": "Pomyślnie rozpoczęto turniej"
+            }, status=200)

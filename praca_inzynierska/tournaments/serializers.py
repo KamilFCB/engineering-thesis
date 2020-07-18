@@ -8,7 +8,7 @@ class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
         fields = ('id', 'name', 'city', 'address',
-                  'date', 'draw_size', 'description')
+                  'date', 'draw_size', 'description', 'started')
 
     def validate(self, data):
         if not math.log2(data['draw_size']).is_integer() or \
@@ -59,6 +59,12 @@ class TournamentNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
         fields = ('id', 'name')
+
+
+class TournamentOrganizerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tournament
+        fields = ('id', 'organizer')
 
 
 class TournamentMatchSerializer(serializers.ModelSerializer):
