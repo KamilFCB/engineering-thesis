@@ -4,6 +4,7 @@ import {
   GET_HISTORY_TOURNAMENTS,
   JOIN_TOURNAMENT,
   LEAVE_TOURNAMENT,
+  GET_ORGANIZED_TOURNAMENTS,
 } from "./types";
 import { setupToken } from "./auth";
 import { GET_ERRORS } from "./types";
@@ -135,6 +136,26 @@ export const leaveTournament = (tournamentId) => (dispatch, getState) => {
       dispatch(
         createMessage({
           joinTournamentsError: err.response.data.message,
+        })
+      );
+    });
+};
+
+export const getUserOrganizedTournaments = (userId) => (dispatch, getState) => {
+  const config = setupToken(getState);
+  axios
+    .get(`/api/tournaments/organized/${userId}`, config)
+    .then((res) => {
+      dispatch({
+        type: GET_ORGANIZED_TOURNAMENTS,
+        payload: res.data,
+      });
+    })
+    .catch((err) => {
+      dispatch(
+        createMessage({
+          getTournamentsError:
+            "Nie udało się pobrać listy turniejów, spróbuj ponownie za chwilę",
         })
       );
     });

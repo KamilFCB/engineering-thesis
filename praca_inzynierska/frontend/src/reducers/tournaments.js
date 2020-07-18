@@ -3,12 +3,14 @@ import {
   GET_HISTORY_TOURNAMENTS,
   JOIN_TOURNAMENT,
   LEAVE_TOURNAMENT,
+  GET_ORGANIZED_TOURNAMENTS,
 } from "../actions/types";
 
 const initialState = {
   isLoading: true,
   incomingTournaments: [],
   historyTournaments: [],
+  organizedTournaments: [],
 };
 
 export default function (state = initialState, action) {
@@ -32,6 +34,12 @@ export default function (state = initialState, action) {
         nextPage: action.payload.nextPage,
         join: false,
         leave: false,
+      };
+    case GET_ORGANIZED_TOURNAMENTS:
+      return {
+        ...state,
+        isLoading: false,
+        organizedTournaments: action.payload.tournaments,
       };
     case JOIN_TOURNAMENT:
       return {

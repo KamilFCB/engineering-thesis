@@ -35,6 +35,9 @@ export class Header extends Component {
             >
               Historia meczów
             </Link>
+            <Link to={user ? "/moje_turnieje" : ""} className="dropdown-item">
+              Moje turnieje
+            </Link>
             <div className="dropdown-divider"></div>
             <a className="dropdown-item" onClick={this.props.logout}>
               Wyloguj
