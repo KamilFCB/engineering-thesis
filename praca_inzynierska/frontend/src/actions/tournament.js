@@ -4,8 +4,11 @@ import {
   GET_TOURNAMENT_INFORMATIONS,
   GET_TOURNAMENT_MATCHES,
   GET_TOURNAMENT_MATCH,
+  GET_TOURNAMENT_ORGANIZER,
+  START_TOURNAMENT,
 } from "./types";
 import { createMessage } from "./messages";
+import { setupToken } from "./auth";
 
 export const getTournamentParticipants = (tournamentId) => (
   dispatch,
@@ -83,6 +86,51 @@ export const getTournamentMatch = (tournamentId, matchId) => (
       dispatch(
         createMessage({
           getTournamentMatchError: err.response.data.message,
+        })
+      );
+    });
+};
+
+export const getTournamentOrganizer = (tournamentId) => (
+  dispatch,
+  getState
+) => {
+  axios
+    .get(`/api/tournament/${tournamentId}/organizer`)
+    .then((res) => {
+      dispatch({
+        type: GET_TOURNAMENT_ORGANIZER,
+        payload: res.data,
+      });
+    })
+    .catch((err) => {
+      dispatch(
+        createMessage({
+          getOrganizerError: err.response.data.message,
+        })
+      );
+    });
+};
+
+export const startTournament = (tournamentId) => (dispatch, getState) => {
+  const config = setupToken(getState);
+  axios
+    .get(`/api/tournament/${tournamentId}/start`, config)
+    .then((res) => {
+      dispatch({
+        type: START_TOURNAMENT,
+        payload: {},
+      });
+      dispatch(
+        createMessage({
+          startTournamentSuccess: "Turniej został rozpoczęty",
+        })
+      );
+    })
+    .catch((err) => {
+      dispatch(
+        createMessage({
+          startTournamentError: err.response.data.message,
         })
       );
     });
