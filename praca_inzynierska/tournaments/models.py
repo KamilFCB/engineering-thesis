@@ -10,6 +10,7 @@ class Tournament(models.Model):
     draw_size = models.PositiveSmallIntegerField()
     description = models.TextField()
     organizer = models.ForeignKey(User, on_delete=models.CASCADE)
+    started = models.BooleanField(default=False)
 
 
 class Participation(models.Model):
@@ -18,9 +19,10 @@ class Participation(models.Model):
 
 
 class Match(models.Model):
-    player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player1")
-    player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2")
+    player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player1", null=True)
+    player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2", null=True)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     date = models.DateField()
     round = models.PositiveSmallIntegerField()
     score = models.CharField(max_length=15)
+    match_number = models.PositiveSmallIntegerField()
