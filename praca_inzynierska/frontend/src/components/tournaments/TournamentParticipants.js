@@ -22,7 +22,9 @@ export class TournamentParticipants extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      this.props.tournament.participants != prevProps.tournament.participants
+      this.props.tournament.participants != prevProps.tournament.participants &&
+      this.props.tournament.participants &&
+      this.props.tournament.participants.participants
     ) {
       this.setState({
         isLoading: this.props.tournament.isLoading,
@@ -41,6 +43,13 @@ export class TournamentParticipants extends Component {
       );
     }
     const spinner = <Spinner />;
+    const noParticipants = (
+      <div className="tab-pane fade" id="participants">
+        <div className="card card-body">
+          <h2 className="text-center">Brak uczestników</h2>
+        </div>
+      </div>
+    );
     const page = (
       <div className="tab-pane fade" id="participants">
         <div className="card card-body">
@@ -74,7 +83,11 @@ export class TournamentParticipants extends Component {
       </div>
     );
 
-    return isLoading ? spinner : page;
+    return isLoading
+      ? spinner
+      : participants.length > 0
+      ? page
+      : noParticipants;
   }
 }
 

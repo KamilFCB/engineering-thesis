@@ -16,15 +16,12 @@ export class Match extends Component {
   };
 
   componentDidMount() {
-    this.props.getTournamentMatch(
-      this.props.match.params.tournamentId,
-      this.props.match.params.matchId
-    );
+    this.props.getTournamentMatch(this.props.match.params.matchId);
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.props);
     if (prevProps.tournament != this.props.tournament) {
+      console.log(this.props.tournament.match);
       this.setState({
         isLoading: this.props.tournament.isLoading,
         match: this.props.tournament.match,
@@ -34,8 +31,8 @@ export class Match extends Component {
 
   render() {
     const { isLoading, match } = this.state;
+    console.log(match);
     if (isLoading) return <Spinner />;
-
     const page = (
       <div className="card card-body">
         <h1 className="text-center">
@@ -45,27 +42,42 @@ export class Match extends Component {
         </h1>
         <hr />
         <div className="row text-center">
+          {match.player1 ? (
+            <div className="col-md-4">
+              <h3 className="font-weight-bold">
+                <Link to={"/gracz/" + match.player1.id}>
+                  {match.player1.first_name} {match.player1.last_name}
+                </Link>
+              </h3>
+              <h6>{match.player1.birth_date}</h6>
+              <h6>{match.player1.residence}</h6>
+            </div>
+          ) : (
+            <div className="col-md-4">
+              <h3 className="font-weight-bold">Wolny los</h3>
+            </div>
+          )}
           <div className="col-md-4">
-            <h3 className="font-weight-bold">
-              <Link to={"/gracz/" + match.player2.id}>
-                {match.player1.first_name} {match.player1.last_name}
-              </Link>
-            </h3>
-            <h6>{match.player1.birth_date}</h6>
-            <h6>{match.player1.residence}</h6>
+            <h5>
+              {match.time ? "Godzina: " + match.time.substring(0, 5) : ""}
+            </h5>
+            <h2>{match.score ? match.score : "Brak wyniku"}</h2>
           </div>
-          <div className="col-md-4">
-            <h2>{match.score}</h2>
-          </div>
-          <div className="col-md-4">
-            <h3 className="font-weight-bold">
-              <Link to={"/gracz/" + match.player2.id}>
-                {match.player2.first_name} {match.player2.last_name}
-              </Link>
-            </h3>
-            <h6>{match.player2.birth_date}</h6>
-            <h6>{match.player2.residence}</h6>
-          </div>
+          {match.player2 ? (
+            <div className="col-md-4">
+              <h3 className="font-weight-bold">
+                <Link to={"/gracz/" + match.player2.id}>
+                  {match.player2.first_name} {match.player2.last_name}
+                </Link>
+              </h3>
+              <h6>{match.player2.birth_date}</h6>
+              <h6>{match.player2.residence}</h6>
+            </div>
+          ) : (
+            <div className="col-md-4">
+              <h3 className="font-weight-bold">Wolny los</h3>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -77,4 +89,5 @@ export class Match extends Component {
 const mapStateToProps = (state) => ({
   tournament: state.tournament,
 });
+
 export default connect(mapStateToProps, { getTournamentMatch })(Match);

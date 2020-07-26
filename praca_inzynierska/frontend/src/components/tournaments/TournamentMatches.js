@@ -20,7 +20,11 @@ export class TournamentMatches extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.tournament.matches != prevProps.tournament.matches) {
+    if (
+      this.props.tournament.matches != prevProps.tournament.matches &&
+      this.props.tournament.matches &&
+      this.props.tournament.matches.matches
+    ) {
       this.setState({
         isLoading: this.props.tournament.isLoading,
         matches: this.props.tournament.matches.matches,
@@ -46,31 +50,40 @@ export class TournamentMatches extends Component {
             <div key={key}>
               <h3>{key}</h3>
               <table className="table table-striped table-dark text-center">
+                <thead>
+                  <tr>
+                    <td>Data</td>
+                    <td>Godzina</td>
+                    <td>Gracz #1</td>
+                    <td>Gracz #2</td>
+                    <td>Wynik</td>
+                  </tr>
+                </thead>
                 <tbody>
                   {value.map((match) => (
                     <tr key={match.id}>
                       <td>{match.date}</td>
+                      <td>{match.time.substring(0, 5)}</td>
                       <td>
-                        <Link to={"/gracz/" + match.player1.id}>
-                          {match.player1.first_name} {match.player1.last_name}
-                        </Link>
+                        {match.player1 ? (
+                          <Link to={"/gracz/" + match.player1.id}>
+                            {match.player1.first_name} {match.player1.last_name}
+                          </Link>
+                        ) : (
+                          "Wolny los"
+                        )}
                       </td>
                       <td>
-                        <Link to={"/gracz/" + match.player2.id}>
-                          {match.player2.first_name} {match.player2.last_name}
-                        </Link>
+                        {match.player2 ? (
+                          <Link to={"/gracz/" + match.player2.id}>
+                            {match.player2.first_name} {match.player2.last_name}
+                          </Link>
+                        ) : (
+                          "Wolny los"
+                        )}
                       </td>
                       <td>
-                        <Link
-                          to={
-                            "/turniej/" +
-                            this.props.tournamentId +
-                            "/mecz/" +
-                            match.id
-                          }
-                        >
-                          {match.score}
-                        </Link>
+                        <Link to={"/mecz/" + match.id}>{match.score}</Link>
                       </td>
                     </tr>
                   ))}
@@ -81,7 +94,14 @@ export class TournamentMatches extends Component {
         </div>
       </div>
     );
-    return isLoading ? spinner : page;
+    const noMatches = (
+      <div className="tab-pane fade" id="matches">
+        <div className="card card-body">
+          <h2 className="text-center">Brak spotkań</h2>
+        </div>
+      </div>
+    );
+    return isLoading ? spinner : matches.length ? page : noMatches;
   }
 }
 
