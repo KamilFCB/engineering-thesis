@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 
 class Tournament(models.Model):
@@ -23,6 +24,7 @@ class Match(models.Model):
     player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2", null=True)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     date = models.DateField()
+    time = models.TimeField(default=datetime.time(0, 00))
     round = models.PositiveSmallIntegerField()
-    score = models.CharField(max_length=15)
+    score = models.CharField(max_length=15, default="", blank=True)
     match_number = models.PositiveSmallIntegerField()

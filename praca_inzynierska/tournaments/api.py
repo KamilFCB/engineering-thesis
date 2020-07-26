@@ -8,7 +8,8 @@ from django.utils.datetime_safe import datetime
 from accounts.serializers import TournamentParticipantSerializer, PlayerMatchSerializer
 from django.http.response import JsonResponse
 from django.db.models import Q
-from .utils import prepare_match_data, reverse_score
+from .utils import (prepare_match_data, reverse_score, prepare_player_match_profile,
+                    number_of_first_match_in_round, match_winner)
 from tournaments.serializers import TournamentNameSerializer
 from django.contrib.auth.models import User
 from accounts.models import TennisProfile
@@ -242,38 +243,53 @@ class TournamentOrganizerAPI(generics.ListAPIView):
             })
 
 
-class TournamentMatchAPI(generics.GenericAPIView):
+class TournamentMatchAPI(generics.RetrieveUpdateAPIView):
     serializer_class = TournamentMatchSerializer
 
     def get(self, request, *args, **kwargs):
-        tournament_id = kwargs['tournament_id']
         match_id = kwargs['match_id']
         try:
-            match = Match.objects.get(tournament_id=tournament_id, pk=match_id)
+            match = Match.objects.get(pk=match_id)
         except Match.DoesNotExist:
             return Response({
                 "message": "Nie ma takiego meczu"
             }, status=406)
         else:
             match_serializer = self.get_serializer(match).data
-            player1 = User.objects.get(pk=match_serializer["player1"])
-            player2 = User.objects.get(pk=match_serializer["player2"])
-            player1_tennis_profile = TennisProfile.objects.get(user=player1)
-            player2_tennis_profile = TennisProfile.objects.get(user=player2)
             tournament = Tournament.objects.get(pk=match_serializer["tournament"])
-
             match_serializer["tournament"] = TournamentNameSerializer(tournament).data
-            player1_tennis_serializer = PlayerMatchSerializer(player1_tennis_profile).data
-            player2_tennis_serializer = PlayerMatchSerializer(player2_tennis_profile).data
 
-            player1_tennis_serializer['first_name'] = player1.first_name
-            player1_tennis_serializer['last_name'] = player1.last_name
-            player2_tennis_serializer['first_name'] = player2.first_name
-            player2_tennis_serializer['last_name'] = player2.last_name
+            if match_serializer["player1"] is not None:
+                match_serializer["player1"] = prepare_player_match_profile(match_serializer["player1"])
 
-            match_serializer["player1"] = player1_tennis_serializer
-            match_serializer["player2"] = player2_tennis_serializer
+            if match_serializer["player2"] is not None:
+                match_serializer["player2"] = prepare_player_match_profile(match_serializer["player2"])
+
             return JsonResponse(match_serializer)
+
+    def put(self, request, *args, **kwargs):
+        match_id = kwargs['match_id']
+        try:
+            match = Match.objects.get(pk=match_id)
+        except Match.DoesNotExist:
+            return Response({
+                "message": "Nie ma takiego meczu"
+            }, status=406)
+        else:
+            if self.request.user.id != match.tournament.organizer.id:
+                return Response({
+                    "message": "Nie jesteś organizatorem tego turnieju"
+                }, status=406)
+
+            serializer_data = self.get_serializer(match).data
+            serializer_data["score"] = request.data["score"]
+            serializer_data["player1"] = request.data["player1"]
+            serializer_data["player2"] = request.data["player2"]
+            serializer_data["time"] = request.data["time"]
+            new_serializer = self.get_serializer(match, data=serializer_data)
+            new_serializer.is_valid(raise_exception=True)
+            new_serializer.save()
+            return Response({})
 
 
 class PlayerMatchesAPI(generics.ListAPIView):
@@ -367,3 +383,61 @@ class StartTournamentAPI(generics.CreateAPIView):
             return Response({
                 "message": "Pomyślnie rozpoczęto turniej"
             }, status=200)
+
+
+class PreviousMatchWinnerAPI(generics.ListAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    def post(self, request, *args, **kwargs):
+        match_id = request.data['match']
+        player_number = request.data['player']
+
+        try:
+            match = Match.objects.get(id=match_id)
+        except Match.DoesNotExist:
+            return Response({
+                "message": "Nie ma takiego meczu"
+            }, status=406)
+        else:
+            round_number = match.round
+
+            if player_number == "1":
+                player = match.player1
+            else:
+                player = match.player2
+
+            if round_number == 1:
+                if player is None:
+                    return Response({
+                        "player_number": player_number,
+                        "player": {}
+                    })
+
+                return Response({
+                    "player_number": player_number,
+                    "player": prepare_player_match_profile(player.id)
+                })
+
+            match_number = match.match_number
+            tournament = match.tournament
+            draw_size = tournament.draw_size
+            first_match_number_in_round = number_of_first_match_in_round(round_number, draw_size)
+            matches_in_previous_round = draw_size / (round_number)
+            previous_match_number = match_number - matches_in_previous_round + (match_number - first_match_number_in_round)
+            if player_number == "2":
+                previous_match_number += 1
+
+            previous_match = Match.objects.get(match_number=previous_match_number, tournament=tournament)
+            if previous_match.score == "":
+                return Response({
+                    "player_number": player_number,
+                    "player": {}
+                })
+
+            prev_match_winner = match_winner(previous_match)
+            return Response({
+                    "player_number": player_number,
+                    "player": prepare_player_match_profile(prev_match_winner.id)
+                })

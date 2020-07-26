@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Tournament, Match
 import math
 import datetime
+import re
 
 
 class TournamentSerializer(serializers.ModelSerializer):
@@ -70,4 +71,27 @@ class TournamentOrganizerSerializer(serializers.ModelSerializer):
 class TournamentMatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
-        fields = ('id', 'player1', 'player2', 'tournament', 'date', 'round', 'score')
+        fields = ('id', 'player1', 'player2', 'tournament', 'date', 'time', 'round', 'score', 'match_number')
+
+    def validate(self, data):
+        score = data["score"]
+        if score != "" and data["player1"] is None and data["player2"] is None:
+            raise serializers.ValidationError("Wybierz co najmniej jednego zawodnika")
+        if re.match("[0-7]:[0-7] [0-7]:[0-7]( [0-7]:[0-7])?", score) is None:
+            raise serializers.ValidationError("Błędny wynik meczu")
+
+        player1_won_sets = 0
+        player2_won_sets = 0
+        for set_score in score.split():
+            games = set_score.split(":")
+            if (int(games[0]) - int(games[1]) >= 2 and games[0] <= "6") or (games[0] == "7" and games[1] == "6"):
+                player1_won_sets += 1
+            elif (int(games[1]) - int(games[0]) >= 2 and games[1] <= "6") or (games[1] == "7" and games[0] == "6"):
+                player2_won_sets += 1
+            else:
+                raise serializers.ValidationError("Błędny wynik meczu")
+
+        if player2_won_sets < 2 and player1_won_sets < 2:
+            raise serializers.ValidationError("Błędny wynik meczu")
+
+        return data
