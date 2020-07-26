@@ -21,6 +21,7 @@ import Tournament from "./tournaments/Tournament";
 import PrivateRoute from "./common/PrivateRoute";
 import { loadUser } from "../actions/auth";
 import ManageTournament from "./tournaments/ManageTournament";
+import ManageMatch from "./tournaments/ManageMatch";
 
 class App extends React.Component {
   alertOptions = {
@@ -65,11 +66,12 @@ class App extends React.Component {
                     path="/zarzadzaj/:id"
                     component={ManageTournament}
                   />
-                  <Route
+                  <PrivateRoute
                     exact
-                    path="/turniej/:tournamentId/mecz/:matchId"
-                    component={Match}
+                    path="/zarzadzaj/mecz/:matchId"
+                    component={ManageMatch}
                   />
+                  <Route exact path="/mecz/:matchId" component={Match} />
                 </Switch>
               </div>
               <Alert />

@@ -26,7 +26,7 @@ export class ManageTournament extends Component {
         <div id="myTabContent" className="tab-content">
           <Fragment>
             <StartTournament tournamentId={tournamentId} />
-            <ManageTournamentMatches />
+            <ManageTournamentMatches tournamentId={tournamentId} />
           </Fragment>
         </div>
       </div>

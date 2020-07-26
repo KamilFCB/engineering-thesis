@@ -6,6 +6,7 @@ import {
   GET_TOURNAMENT_MATCH,
   GET_TOURNAMENT_ORGANIZER,
   START_TOURNAMENT,
+  GET_PREV_MATCH_WINNER,
 } from "./types";
 import { createMessage } from "./messages";
 import { setupToken } from "./auth";
@@ -70,12 +71,9 @@ export const getTournamentMatches = (tournamentId) => (dispatch, getState) => {
     });
 };
 
-export const getTournamentMatch = (tournamentId, matchId) => (
-  dispatch,
-  getState
-) => {
+export const getTournamentMatch = (matchId) => (dispatch, getState) => {
   axios
-    .get(`/api/tournament/${tournamentId}/match/${matchId}`)
+    .get(`/api/tournament/match/${matchId}`)
     .then((res) => {
       dispatch({
         type: GET_TOURNAMENT_MATCH,
@@ -133,5 +131,71 @@ export const startTournament = (tournamentId) => (dispatch, getState) => {
           startTournamentError: err.response.data.message,
         })
       );
+    });
+};
+
+export const prevMatchWinner = (match, player) => (dispatch, getState) => {
+  const config = setupToken(getState);
+  const bodyRequest = JSON.stringify({
+    match,
+    player,
+  });
+
+  axios
+    .post(`/api/tournament/match/possible_player`, bodyRequest, config)
+    .then((res) => {
+      dispatch({
+        type: GET_PREV_MATCH_WINNER,
+        payload: {
+          playerNumber: res.data.player_number,
+          player: res.data.player,
+        },
+      });
+    })
+    .catch((err) => {
+      dispatch(
+        createMessage({
+          startTournamentError: err.response.data.message,
+        })
+      );
+    });
+};
+
+export const updateMatch = ({ matchId, player1, player2, score, time }) => (
+  dispatch,
+  getState
+) => {
+  const config = setupToken(getState);
+  const bodyRequest = JSON.stringify({
+    player1,
+    player2,
+    score,
+    time,
+  });
+
+  axios
+    .put(`/api/tournament/match/${matchId}`, bodyRequest, config)
+    .then((res) => {
+      dispatch(
+        createMessage({
+          updateSuccess: "Mecz został zaktualizowany",
+        })
+      );
+    })
+    .catch((err) => {
+      if (err.response.data.message) {
+        dispatch(
+          createMessage({
+            matchUpdateError: err.response.data.message,
+          })
+        );
+      }
+      if (err.response.data.non_field_errors) {
+        dispatch(
+          createMessage({
+            matchUpdateError: err.response.data.non_field_errors[0],
+          })
+        );
+      }
     });
 };

@@ -102,6 +102,9 @@ export class Alert extends Component {
       if (message.startTournamentSuccess) {
         alert.success(message.startTournamentSuccess);
       }
+      if (message.matchUpdateError) {
+        alert.error(message.matchUpdateError);
+      }
     }
   }
 

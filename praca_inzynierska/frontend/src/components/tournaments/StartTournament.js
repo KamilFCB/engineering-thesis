@@ -11,7 +11,7 @@ import {
 
 export class StartTournament extends Component {
   state = {
-    tournamentOrganizer: true,
+    tournamentOrganizer: null,
     name: null,
     city: null,
     address: null,
@@ -29,7 +29,6 @@ export class StartTournament extends Component {
   };
 
   componentDidMount() {
-    this.props.getTournamentOrganizer(this.props.tournamentId);
     this.props.getTournamentInformations(this.props.tournamentId);
   }
 
@@ -49,7 +48,6 @@ export class StartTournament extends Component {
       this.props.tournament.informations
     ) {
       this.setState({
-        isLoading: false,
         name: this.props.tournament.informations.name,
         city: this.props.tournament.informations.city,
         address: this.props.tournament.informations.address,
@@ -58,6 +56,7 @@ export class StartTournament extends Component {
         description: this.props.tournament.informations.description,
         started: this.props.tournament.informations.started,
       });
+      this.props.getTournamentOrganizer(this.props.tournamentId);
     }
     if (
       this.props.tournament.started != previousProps.tournament.started &&

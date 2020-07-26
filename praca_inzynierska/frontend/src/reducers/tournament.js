@@ -5,6 +5,7 @@ import {
   GET_TOURNAMENT_MATCH,
   GET_TOURNAMENT_ORGANIZER,
   START_TOURNAMENT,
+  GET_PREV_MATCH_WINNER,
 } from "../actions/types";
 
 const initialState = {
@@ -24,7 +25,6 @@ export default function (state = initialState, action) {
       };
     case GET_TOURNAMENT_INFORMATIONS:
       return {
-        ...state,
         isLoading: false,
         informations: action.payload,
       };
@@ -48,6 +48,10 @@ export default function (state = initialState, action) {
       return {
         ...state,
         started: true,
+      };
+    case GET_PREV_MATCH_WINNER:
+      return {
+        prevMatchWinner: action.payload,
       };
     default:
       return state;
