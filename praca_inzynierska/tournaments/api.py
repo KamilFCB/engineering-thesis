@@ -45,8 +45,19 @@ class TournamentAPI(generics.ListAPIView):
                 "message": "Taki turniej nie istnieje"
             }, status=400)
 
-        serializer = self.get_serializer(tournament)
-        return Response(serializer.data)
+        serialized_tournament = self.get_serializer(tournament).data
+        if self.request.user.is_authenticated:
+            if serialized_tournament['end_of_registration'] >= datetime.now().date():
+                serialized_tournament['can_join'] = True
+
+            try:
+                Participation.objects.get(player=self.request.user,
+                                          tournament=serialized_tournament['id'])
+                serialized_tournament['participate'] = True
+            except Participation.DoesNotExist:
+                pass
+
+        return Response(serialized_tournament)
 
 
 class IncomingTournamentsPageAPI(generics.ListAPIView):
@@ -62,6 +73,9 @@ class IncomingTournamentsPageAPI(generics.ListAPIView):
                            for tournament in page_obj.object_list]
         if self.request.user.is_authenticated:
             for tournament in serializer_list:
+                if tournament['end_of_registration'] >= datetime.now().date():
+                    tournament['can_join'] = True
+
                 try:
                     Participation.objects.get(player=self.request.user,
                                               tournament=tournament['id'])
@@ -115,7 +129,7 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
             return Response({
                 "message": "Taki turniej nie istnieje"
             }, status=400)
-        if tournament.date < datetime.now().date():
+        if tournament.end_of_registration < datetime.now().date():
             return Response({
                 "message": "Zapisy zostały zakończone"
             }, status=406)
@@ -145,7 +159,7 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
             user = self.request.user
             participation = Participation.objects.get(tournament=tournament,
                                                       player=user)
-            if tournament.date <= datetime.now().date():
+            if tournament.end_of_registration <= datetime.now().date():
                 return Response({
                     "message": "Czas wypisów z tego turneju już minął"
                 }, status=406)
@@ -348,10 +362,10 @@ class StartTournamentAPI(generics.CreateAPIView):
                     "message": "Turniej już się rozpoczął"
                 }, status=406)
             
-            # if tournament.date != datetime.now():
-            #     return Response({
-            #         "message": "Nie możesz jeszcze rozpocząć tego turnieju"
-            #     }, status=406)
+            if tournament.end_of_registration != datetime.now():
+                return Response({
+                    "message": "Nie możesz jeszcze rozpocząć tego turnieju, poczekaj do końca zapisów"
+                }, status=406)
             
             matches_in_round = tournament.draw_size // 2
             round = 1

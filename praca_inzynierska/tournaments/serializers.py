@@ -5,11 +5,11 @@ import datetime
 import re
 
 
-class TournamentSerializer(serializers.ModelSerializer):
+class TournamentSerializer(serializers.BaseSerializer):
     class Meta:
         model = Tournament
-        fields = ('id', 'name', 'city', 'address',
-                  'date', 'draw_size', 'description', 'started')
+        fields = ('id', 'name', 'city', 'address', 'end_of_registration', 'can_join',
+                  'date', 'draw_size', 'description', 'started', 'participate')
 
     def validate(self, data):
         if not math.log2(data['draw_size']).is_integer() or \
@@ -27,6 +27,10 @@ class TournamentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Błędna data, turniej musi odbyć \
                                                się w przyszłości")
 
+        if data['end_of_registration'] >= data['date']:
+            raise serializers.ValidationError("Zapisy do turnieju muszą się zakończyc \
+                                               przed rozpocząciem turnieju")
+
         return data
 
     def update(self, instance, validated_data):
@@ -36,14 +40,31 @@ class TournamentSerializer(serializers.ModelSerializer):
         instance.date = validated_data['date']
         instance.draw_size = validated_data['draw_size']
         instance.description = validated_data['description']
+        instance.end_of_registration = validated_data['end_of_registration']
         instance.save()
         return instance
+
+    def to_representation(self, instance):
+        return {
+            'id': instance.id,
+            'name': instance.name,
+            'city': instance.city,
+            'address': instance.address,
+            'date': instance.date,
+            'draw_size': instance.draw_size,
+            'description': instance.description,
+            'end_of_registration': instance.end_of_registration,
+            'started': instance.started,
+            'participate': False,
+            'can_join': False,
+        }
 
 
 class TournamentsPageSerializer(serializers.BaseSerializer):
     class Meta:
         model = Tournament
-        fields = ('id', 'name', 'city', 'date', 'draw_size', 'participate')
+        fields = ('id', 'name', 'city', 'date', 'end_of_registration',
+                  'draw_size', 'participate', 'can_join')
 
     def to_representation(self, instance):
         return {
@@ -52,14 +73,16 @@ class TournamentsPageSerializer(serializers.BaseSerializer):
             'city': instance.city,
             'date': instance.date,
             'draw_size': instance.draw_size,
-            'participate': False
+            'end_of_registration': instance.end_of_registration,
+            'participate': False,
+            'can_join': False,
         }
 
 
 class TournamentNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'draw_size')
 
 
 class TournamentOrganizerSerializer(serializers.ModelSerializer):

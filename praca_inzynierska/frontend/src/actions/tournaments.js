@@ -17,6 +17,7 @@ export const createTournament = ({
   date,
   draw_size,
   description,
+  end_of_registration,
 }) => (dispatch, getState) => {
   const config = setupToken(getState);
   const bodyRequest = JSON.stringify({
@@ -26,6 +27,7 @@ export const createTournament = ({
     date,
     draw_size,
     description,
+    end_of_registration,
   });
 
   axios

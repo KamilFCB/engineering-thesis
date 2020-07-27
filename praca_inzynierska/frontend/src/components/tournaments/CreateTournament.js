@@ -11,6 +11,7 @@ export class CreateTournament extends Component {
     date: "",
     drawSize: "",
     description: "",
+    endOfRegistration: "",
   };
 
   static propTypes = {
@@ -19,7 +20,15 @@ export class CreateTournament extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
-    const { name, city, address, date, drawSize, description } = this.state;
+    const {
+      name,
+      city,
+      address,
+      date,
+      drawSize,
+      description,
+      endOfRegistration,
+    } = this.state;
     const newTournament = {
       name,
       city,
@@ -27,6 +36,7 @@ export class CreateTournament extends Component {
       date,
       draw_size: parseInt(drawSize),
       description,
+      end_of_registration: endOfRegistration,
     };
     this.props.createTournament(newTournament);
   };
@@ -37,7 +47,15 @@ export class CreateTournament extends Component {
     });
 
   render() {
-    const { name, city, address, date, drawSize, description } = this.state;
+    const {
+      name,
+      city,
+      address,
+      date,
+      endOfRegistration,
+      drawSize,
+      description,
+    } = this.state;
 
     return (
       <div className="card card-body">
@@ -81,6 +99,16 @@ export class CreateTournament extends Component {
               name="date"
               onChange={this.onChange}
               value={date}
+            />
+          </div>
+          <div className="form-group">
+            <label>Koniec zapisów</label>
+            <input
+              className="form-control"
+              type="date"
+              name="endOfRegistration"
+              onChange={this.onChange}
+              value={endOfRegistration}
             />
           </div>
           <div className="form-group">

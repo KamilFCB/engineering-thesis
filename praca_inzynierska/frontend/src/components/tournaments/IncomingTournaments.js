@@ -29,11 +29,15 @@ export class IncomingTournaments extends Component {
     this.props.getIncomingTournamentsPage(this.state.nextPage);
   };
 
-  getButton = (participate, tournamentId) => {
+  getButton = (participate, tournamentId, canJoin) => {
     const joinButton = (
       <button
         type="button"
-        className="btn btn-outline-primary"
+        className={
+          canJoin
+            ? "btn btn-outline-primary"
+            : "btn btn-outline-primary disabled"
+        }
         onClick={() => this.props.joinTournament(tournamentId)}
       >
         Zapisz się
@@ -42,16 +46,29 @@ export class IncomingTournaments extends Component {
     const leaveButton = (
       <button
         type="button"
-        className="btn btn-outline-primary"
-        onClick={() => this.props.leaveTournament(tournamentId)}
+        className={
+          canJoin
+            ? "btn btn-outline-primary"
+            : "btn btn-outline-primary disabled"
+        }
+        onClick={() =>
+          canJoin ? this.props.leaveTournament(tournamentId) : {}
+        }
       >
         Opuść turniej
       </button>
     );
+    const registrationFinished = (
+      <button type="button" className="btn btn-outline-primary disabled">
+        Zapisy zakończone
+      </button>
+    );
+
     if (participate) {
       return leaveButton;
     } else {
-      return joinButton;
+      if (canJoin) return joinButton;
+      return registrationFinished;
     }
   };
 
@@ -123,6 +140,7 @@ export class IncomingTournaments extends Component {
                   <th scope="col">Miasto</th>
                   <th scope="col">Data</th>
                   <th scope="col">Rozmiar drabinki</th>
+                  <th scope="col">Koniec zapisów</th>
                   <th></th>
                 </tr>
               </thead>
@@ -137,8 +155,13 @@ export class IncomingTournaments extends Component {
                     <td>{tournament.city}</td>
                     <td>{tournament.date}</td>
                     <td>{tournament.draw_size}</td>
+                    <td>{tournament.end_of_registration}</td>
                     <td>
-                      {this.getButton(tournament.participate, tournament.id)}
+                      {this.getButton(
+                        tournament.participate,
+                        tournament.id,
+                        tournament.can_join
+                      )}
                     </td>
                   </tr>
                 ))}

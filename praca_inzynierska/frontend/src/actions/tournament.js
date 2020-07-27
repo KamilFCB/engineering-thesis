@@ -36,8 +36,9 @@ export const getTournamentInformations = (tournamentId) => (
   dispatch,
   getState
 ) => {
+  const config = setupToken(getState);
   axios
-    .get(`/api/tournament/${tournamentId}`)
+    .get(`/api/tournament/${tournamentId}`, config)
     .then((res) => {
       dispatch({
         type: GET_TOURNAMENT_INFORMATIONS,

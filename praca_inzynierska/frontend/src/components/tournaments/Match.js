@@ -21,7 +21,6 @@ export class Match extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.tournament != this.props.tournament) {
-      console.log(this.props.tournament.match);
       this.setState({
         isLoading: this.props.tournament.isLoading,
         match: this.props.tournament.match,
@@ -31,7 +30,6 @@ export class Match extends Component {
 
   render() {
     const { isLoading, match } = this.state;
-    console.log(match);
     if (isLoading) return <Spinner />;
     const page = (
       <div className="card card-body">
