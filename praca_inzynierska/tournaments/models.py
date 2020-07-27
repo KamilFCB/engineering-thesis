@@ -8,6 +8,7 @@ class Tournament(models.Model):
     city = models.CharField(max_length=50)
     address = models.CharField(max_length=100)
     date = models.DateField()
+    end_of_registration = models.DateField()
     draw_size = models.PositiveSmallIntegerField()
     description = models.TextField()
     organizer = models.ForeignKey(User, on_delete=models.CASCADE)
