@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-import TournamentDraw from "./TournamentDraw";
 import TournamentInformation from "./TournamentInformation";
 import TournamentParticipants from "./TournamentParticipants";
 import TournamentMatches from "./TournamentMatches";
@@ -38,7 +37,6 @@ export class Tournament extends Component {
         <div id="myTabContent" className="tab-content">
           <Fragment>
             <TournamentInformation tournamentId={tournamentId} />
-            <TournamentDraw tournamentId={tournamentId} />
             <TournamentMatches tournamentId={tournamentId} />
             <TournamentParticipants tournamentId={tournamentId} />
           </Fragment>

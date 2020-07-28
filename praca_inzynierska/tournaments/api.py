@@ -226,7 +226,7 @@ class TournamentMatchesAPI(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         tournament_id = kwargs['tournament_id']
         try:
-            matches = Match.objects.filter(tournament_id=tournament_id).order_by("round")
+            matches = Match.objects.filter(tournament_id=tournament_id).order_by("match_number")
         except Match.DoesNotExist:
             return Response({
                 "message": "Brak meczów"
