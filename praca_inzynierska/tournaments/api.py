@@ -1,10 +1,10 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .serializers import (TournamentSerializer, TournamentsPageSerializer,
-                          TournamentMatchSerializer, TournamentOrganizerSerializer)
+                          TournamentMatchSerializer, TournamentOrganizerSerializer,
+                          RankingSerializer)
 from .models import Tournament, Participation, Match
 from django.core.paginator import Paginator
-from django.utils.datetime_safe import datetime
 from accounts.serializers import TournamentParticipantSerializer, PlayerMatchSerializer
 from django.http.response import JsonResponse
 from django.db.models import Q
@@ -14,6 +14,7 @@ from tournaments.serializers import TournamentNameSerializer
 from django.contrib.auth.models import User
 from accounts.models import TennisProfile
 import random
+import datetime
 
 
 class CreateTournamentAPI(generics.GenericAPIView):
@@ -47,7 +48,7 @@ class TournamentAPI(generics.ListAPIView):
 
         serialized_tournament = self.get_serializer(tournament).data
         if self.request.user.is_authenticated:
-            if serialized_tournament['end_of_registration'] >= datetime.now().date():
+            if serialized_tournament['end_of_registration'] >= datetime.datetime.now().date():
                 serialized_tournament['can_join'] = True
 
             try:
@@ -63,7 +64,7 @@ class TournamentAPI(generics.ListAPIView):
 class IncomingTournamentsPageAPI(generics.ListAPIView):
     serializer_class = TournamentsPageSerializer
     queryset = (Tournament.objects
-                          .filter(date__gt=datetime.now()).order_by('date'))
+                          .filter(date__gt=datetime.datetime.now()).order_by('date'))
 
     def get(self, request, *args, **kwargs):
         paginator = Paginator(self.queryset, 25)
@@ -73,7 +74,7 @@ class IncomingTournamentsPageAPI(generics.ListAPIView):
                            for tournament in page_obj.object_list]
         if self.request.user.is_authenticated:
             for tournament in serializer_list:
-                if tournament['end_of_registration'] >= datetime.now().date():
+                if tournament['end_of_registration'] >= datetime.datetime.now().date():
                     tournament['can_join'] = True
 
                 try:
@@ -92,7 +93,7 @@ class IncomingTournamentsPageAPI(generics.ListAPIView):
 class HistoryTournamentsPageAPI(generics.ListAPIView):
     serializer_class = TournamentsPageSerializer
     queryset = (Tournament.objects
-                          .filter(date__lt=datetime.now()).order_by('date'))
+                          .filter(date__lt=datetime.datetime.now()).order_by('date'))
 
     def get(self, request, *args, **kwargs):
         paginator = Paginator(self.queryset, 25)
@@ -129,7 +130,7 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
             return Response({
                 "message": "Taki turniej nie istnieje"
             }, status=400)
-        if tournament.end_of_registration < datetime.now().date():
+        if tournament.end_of_registration < datetime.datetime.now().date():
             return Response({
                 "message": "Zapisy zostały zakończone"
             }, status=406)
@@ -159,7 +160,7 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
             user = self.request.user
             participation = Participation.objects.get(tournament=tournament,
                                                       player=user)
-            if tournament.end_of_registration <= datetime.now().date():
+            if tournament.end_of_registration <= datetime.datetime.now().date():
                 return Response({
                     "message": "Czas wypisów z tego turneju już minął"
                 }, status=406)
@@ -438,7 +439,7 @@ class PreviousMatchWinnerAPI(generics.ListAPIView):
             tournament = match.tournament
             draw_size = tournament.draw_size
             first_match_number_in_round = number_of_first_match_in_round(round_number, draw_size)
-            matches_in_previous_round = draw_size / (round_number)
+            matches_in_previous_round = draw_size / (2 ** (round_number - 1))
             previous_match_number = match_number - matches_in_previous_round + (match_number - first_match_number_in_round)
             if player_number == "2":
                 previous_match_number += 1
@@ -455,3 +456,38 @@ class PreviousMatchWinnerAPI(generics.ListAPIView):
                     "player_number": player_number,
                     "player": prepare_player_match_profile(prev_match_winner.id)
                 })
+
+
+class PlayersRankingAPI(generics.ListCreateAPIView):
+    serializer_class = RankingSerializer
+
+    def get(self, request, *args, **kwargs):
+        start_date = datetime.datetime.now() - datetime.timedelta(days=365)
+        end_date = datetime.datetime.now()
+        matches = Match.objects.filter(date__gte=start_date,
+                                       date__lte=end_date,
+                                       player1__isnull=False,
+                                       player2__isnull=False)
+
+        ranking = {}
+        for match in matches:
+            winner = match_winner(match)
+            if winner in ranking:
+                ranking[winner] += match.round * 10
+            else:
+                ranking[winner] = match.round * 10
+
+        sorted_ranking = sorted(ranking.items(), key=lambda x: x[1], reverse=True)
+        serialized_ranking = []
+        place = 1
+        for player, points in sorted_ranking:
+            ranking_position = self.get_serializer(player).data
+            ranking_position['points'] = points
+            ranking_position['place'] = place
+            place += 1
+            serialized_ranking.append(ranking_position)
+
+        return Response({'ranking': serialized_ranking,
+                         'start_date': start_date.strftime("%Y-%m-%d"),
+                         'end_date': end_date.strftime("%Y-%m-%d"),
+                         'is_loading': False})

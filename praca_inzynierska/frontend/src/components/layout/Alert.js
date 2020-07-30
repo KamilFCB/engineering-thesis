@@ -105,6 +105,9 @@ export class Alert extends Component {
       if (message.matchUpdateError) {
         alert.error(message.matchUpdateError);
       }
+      if (message.getRankingError) {
+        alert.error(message.getRankingError);
+      }
     }
   }
 

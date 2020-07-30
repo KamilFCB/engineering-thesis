@@ -5,6 +5,7 @@ import {
   JOIN_TOURNAMENT,
   LEAVE_TOURNAMENT,
   GET_ORGANIZED_TOURNAMENTS,
+  GET_PLAYERS_RANKING,
 } from "./types";
 import { setupToken } from "./auth";
 import { GET_ERRORS } from "./types";
@@ -158,6 +159,25 @@ export const getUserOrganizedTournaments = (userId) => (dispatch, getState) => {
         createMessage({
           getTournamentsError:
             "Nie udało się pobrać listy turniejów, spróbuj ponownie za chwilę",
+        })
+      );
+    });
+};
+
+export const getPlayersRanking = () => (dispatch, getState) => {
+  axios
+    .get("/api/ranking")
+    .then((res) => {
+      dispatch({
+        type: GET_PLAYERS_RANKING,
+        payload: res.data,
+      });
+    })
+    .catch((err) => {
+      dispatch(
+        createMessage({
+          getRankingError:
+            "Nie udało się pobrać rankingu, spróbuj ponownie za chwilę",
         })
       );
     });

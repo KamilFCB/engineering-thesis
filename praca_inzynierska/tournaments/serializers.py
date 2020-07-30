@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Tournament, Match
+from django.contrib.auth.models import User
 import math
 import datetime
 import re
@@ -98,23 +99,39 @@ class TournamentMatchSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         score = data["score"]
-        if score != "" and data["player1"] is None and data["player2"] is None:
-            raise serializers.ValidationError("Wybierz co najmniej jednego zawodnika")
-        if re.match("[0-7]:[0-7] [0-7]:[0-7]( [0-7]:[0-7])?", score) is None:
-            raise serializers.ValidationError("Błędny wynik meczu")
-
-        player1_won_sets = 0
-        player2_won_sets = 0
-        for set_score in score.split():
-            games = set_score.split(":")
-            if (int(games[0]) - int(games[1]) >= 2 and games[0] <= "6") or (games[0] == "7" and games[1] == "6"):
-                player1_won_sets += 1
-            elif (int(games[1]) - int(games[0]) >= 2 and games[1] <= "6") or (games[1] == "7" and games[0] == "6"):
-                player2_won_sets += 1
-            else:
+        if score != "":
+            if data["player1"] is None and data["player2"] is None:
+                raise serializers.ValidationError("Wybierz co najmniej jednego zawodnika")
+            if re.match("[0-7]:[0-7] [0-7]:[0-7]( [0-7]:[0-7])?", score) is None:
                 raise serializers.ValidationError("Błędny wynik meczu")
 
-        if player2_won_sets < 2 and player1_won_sets < 2:
-            raise serializers.ValidationError("Błędny wynik meczu")
+            player1_won_sets = 0
+            player2_won_sets = 0
+            for set_score in score.split():
+                games = set_score.split(":")
+                if (int(games[0]) - int(games[1]) >= 2 and games[0] <= "6") or (games[0] == "7" and games[1] == "6"):
+                    player1_won_sets += 1
+                elif (int(games[1]) - int(games[0]) >= 2 and games[1] <= "6") or (games[1] == "7" and games[0] == "6"):
+                    player2_won_sets += 1
+                else:
+                    raise serializers.ValidationError("Błędny wynik meczu")
+
+            if player2_won_sets < 2 and player1_won_sets < 2:
+                raise serializers.ValidationError("Błędny wynik meczu")
 
         return data
+
+
+class RankingSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'points', 'place')
+
+    def to_representation(self, instance):
+        return {
+            'id': instance.id,
+            'first_name': instance.first_name,
+            'last_name': instance.last_name,
+            'place': 0,
+            'points': 0,
+        }

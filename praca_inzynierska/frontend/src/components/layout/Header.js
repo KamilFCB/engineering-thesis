@@ -94,6 +94,11 @@ export class Header extends Component {
                   Utwórz turniej
                 </Link>
               </li>
+              <li className="nav-item">
+                <Link to="/ranking" className="nav-link">
+                  Ranking
+                </Link>
+              </li>
             </ul>
           </div>
           {isAuthenticated ? userLinks : guestLinks}
