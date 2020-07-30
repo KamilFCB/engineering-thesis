@@ -32,14 +32,35 @@ export class ManageTournamentMatches extends Component {
     }
   }
 
+  previousMatchNumber(round, drawSize, match, isPlayer2) {
+    const matchesInPreviousRound = drawSize / 2 ** (round - 1);
+    let firstMatchNumberInRound = 0;
+    for (let i = 1; i < round; i++) {
+      drawSize /= 2;
+      firstMatchNumberInRound += drawSize;
+    }
+    firstMatchNumberInRound = parseInt(firstMatchNumberInRound + 1);
+
+    return (
+      parseInt(
+        match - matchesInPreviousRound + (match - firstMatchNumberInRound)
+      ) + isPlayer2
+    );
+  }
+
   render() {
     const { isLoading, matches } = this.state;
     let round_matches = {};
     matches.forEach((match) => {
-      if (Object.keys(round_matches).includes("Runda" + match.round)) {
-        round_matches["Runda" + match.round].push(match);
+      let round = match.tournament.draw_size / 2 ** match.round;
+      if (round == 1) {
+        round_matches["Finał"] = [match];
       } else {
-        round_matches["Runda" + match.round] = [match];
+        if (Object.keys(round_matches).includes(`1/${round} finału`)) {
+          round_matches[`1/${round} finału`].push(match);
+        } else {
+          round_matches[`1/${round} finału`] = [match];
+        }
       }
     });
     const spinner = <Spinner />;
@@ -53,14 +74,23 @@ export class ManageTournamentMatches extends Component {
                 <tbody>
                   {value.map((match) => (
                     <tr key={match.id}>
+                      <td>{match.match_number}</td>
                       <td>{match.date}</td>
                       <td>
                         {match.player1 ? (
                           <Link to={"/gracz/" + match.player1.id}>
                             {match.player1.first_name} {match.player1.last_name}
                           </Link>
-                        ) : (
+                        ) : match.round == 1 ? (
                           "Wolny los"
+                        ) : (
+                          "Zwycięzca meczu #" +
+                          this.previousMatchNumber(
+                            match.round,
+                            match.tournament.draw_size,
+                            match.match_number,
+                            0
+                          )
                         )}
                       </td>
                       <td>
@@ -68,8 +98,16 @@ export class ManageTournamentMatches extends Component {
                           <Link to={"/gracz/" + match.player2.id}>
                             {match.player2.first_name} {match.player2.last_name}
                           </Link>
-                        ) : (
+                        ) : match.round == 1 ? (
                           "Wolny los"
+                        ) : (
+                          "Zwycięzca meczu #" +
+                          this.previousMatchNumber(
+                            match.round,
+                            match.tournament.draw_size,
+                            match.match_number,
+                            1
+                          )
                         )}
                       </td>
                       <td>

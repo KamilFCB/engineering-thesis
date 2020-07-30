@@ -24,6 +24,7 @@ export class ManageMatch extends Component {
     score: "",
     round: null,
     tournamentOrganizer: false,
+    matchNumber: null,
   };
 
   static propTypes = {
@@ -52,6 +53,7 @@ export class ManageMatch extends Component {
         round: this.props.tournament.match.round,
         score: this.props.tournament.match.score,
         time: this.props.tournament.match.time,
+        matchNumber: this.props.tournament.match.match_number,
       });
       this.props.getTournamentOrganizer(
         this.props.tournament.match.tournament.id
@@ -133,7 +135,9 @@ export class ManageMatch extends Component {
       tournament,
       tournamentOrganizer,
       score,
+      round,
       time,
+      matchNumber,
     } = this.state;
     const userId = this.props.auth.user.id;
     const spinner = <Spinner />;
@@ -144,7 +148,12 @@ export class ManageMatch extends Component {
         ) : (
           ""
         )}
-        <h2>Edytuj mecz</h2>
+        <div className="row text-center">
+          <div className="col-md-4 offset-md-4">
+            <h2>{tournament.name}</h2>
+          </div>
+        </div>
+        <h2>{`Edytuj mecz #${matchNumber}`}</h2>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
             <label>Gracz #1</label>
@@ -154,7 +163,7 @@ export class ManageMatch extends Component {
               onChange={this.onChange}
               value={player1 ? player1.id : "-"}
             >
-              <option value="-">Wolny los</option>
+              <option value="-">{round == 1 ? "Wolny los" : "-"}</option>
               {!isEmpty(prevPlayer1) ? (
                 <option value={prevPlayer1.id}>
                   {prevPlayer1.first_name + " " + prevPlayer1.last_name}
@@ -172,7 +181,7 @@ export class ManageMatch extends Component {
               onChange={this.onChange}
               value={player2 ? player2.id : "-"}
             >
-              <option value="-">Wolny los</option>
+              <option value="-">{round == 1 ? "Wolny los" : "-"}</option>
               {!isEmpty(prevPlayer2) ? (
                 <option value={prevPlayer2.id}>
                   {prevPlayer2.first_name + " " + prevPlayer2.last_name}

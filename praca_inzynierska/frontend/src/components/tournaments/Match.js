@@ -30,14 +30,19 @@ export class Match extends Component {
 
   render() {
     const { isLoading, match } = this.state;
+    const round = match.tournament
+      ? match.tournament.draw_size / 2 ** match.round
+      : 1;
     if (isLoading) return <Spinner />;
     const page = (
-      <div className="card card-body">
-        <h1 className="text-center">
+      <div className="card card-body text-center">
+        <h1>
           <Link to={"/turniej/" + match.tournament.id}>
             {match.tournament.name}
           </Link>
         </h1>
+        <h4>{round == 1 ? "Finał" : `1/${round} finału`}</h4>
+        <h4>{`${match.date} ${match.time.substring(0, 5)}`}</h4>
         <hr />
         <div className="row text-center">
           {match.player1 ? (
@@ -56,9 +61,6 @@ export class Match extends Component {
             </div>
           )}
           <div className="col-md-4">
-            <h5>
-              {match.time ? "Godzina: " + match.time.substring(0, 5) : ""}
-            </h5>
             <h2>{match.score ? match.score : "Brak wyniku"}</h2>
           </div>
           {match.player2 ? (
