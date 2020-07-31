@@ -13,6 +13,7 @@ class Tournament(models.Model):
     description = models.TextField()
     organizer = models.ForeignKey(User, on_delete=models.CASCADE)
     started = models.BooleanField(default=False)
+    accepted = models.BooleanField(default=False)
 
 
 class Participation(models.Model):
