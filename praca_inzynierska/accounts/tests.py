@@ -7,6 +7,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.expected_conditions import url_changes
 from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 from .models import TennisProfile
 
 
@@ -15,33 +16,39 @@ class AccountBackendTests(APITestCase):
         userdata = {
             "username": "test",
             "email": "",
+            "first_name": "Kamil",
+            "last_name": "Woś",
             "password": "test"
         }
         self.client.post("/api/auth/register", userdata, format='json')
 
     def test_create_account_correct(self):
-        user = {
+        userdata = {
             "username": "test",
             "email": "",
+            "first_name": "Kamil",
+            "last_name": "Woś",
             "password": "test"
         }
 
         self.assertEqual(User.objects.count(), 0)
-        response = self.client.post("/api/auth/register", user, format='json')
+        response = self.client.post("/api/auth/register", userdata, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
 
     def test_create_two_accounts_with_same_username(self):
-        user = {
+        userdata = {
             "username": "test",
             "email": "",
+            "first_name": "Kamil",
+            "last_name": "Woś",
             "password": "test"
         }
 
         self.assertEqual(User.objects.count(), 0)
-        response = self.client.post("/api/auth/register", user, format='json')
+        response = self.client.post("/api/auth/register", userdata, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        response = self.client.post("/api/auth/register", user, format='json')
+        response = self.client.post("/api/auth/register", userdata, format='json')
         self.assertEqual(User.objects.count(), 1)
 
     def test_login_with_correct_data(self):
@@ -94,12 +101,11 @@ class AccountBackendTests(APITestCase):
         user = User.objects.get(username="test")
         self.client.login(username='test', password='test')
         self.client.force_authenticate(user=user)
-
         data = {
             "residence": "Wroclaw",
             "weight": "60",
             "height": "170",
-            "forehand": "LEFT",
+            "forehand": "Leworęczny",
             "backhand": "",
             "birth_date": "",
         }
@@ -110,7 +116,7 @@ class AccountBackendTests(APITestCase):
         self.assertIsNone(tennis_profile.birth_date)
         self.assertEqual(tennis_profile.weight, 60)
         self.assertEqual(tennis_profile.height, 170)
-        self.assertEqual(tennis_profile.forehand, "LEFT")
+        self.assertEqual(tennis_profile.forehand, "Leworęczny")
 
     def test_update_tennis_profile_with_credentials_and_incorrect_data(self):
         self.register_user()
@@ -122,7 +128,7 @@ class AccountBackendTests(APITestCase):
             "residence": "Wroclaw",
             "weight": "60",
             "height": "170",
-            "forehand": "LEFT2",
+            "forehand": "LEFT_HANDED",
             "backhand": "",
             "birth_date": "",
         }
@@ -157,9 +163,8 @@ class AccountBackendTests(APITestCase):
 
         data = {
             "first_name": "Janusz",
-            "last_name": "",
-            "email": "test@test.pl",
-            "username": "test"
+            "last_name": "Nowak",
+            "email": "test@test.pl"
         }
         self.client.put("/api/user/profile", data, format="json")
         user = User.objects.get(username="test")
@@ -181,7 +186,7 @@ class AccountFrontendTests(LiveServerTestCase):
     __url = "http://127.0.0.1:8000/#/"
 
     def setUp(self):
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())
 
     def tearDown(self):
         self.driver.close()
@@ -225,8 +230,7 @@ class AccountFrontendTests(LiveServerTestCase):
         username.send_keys("Kamil")
         password.send_keys("12345")
         password2.send_keys("12345")
-        submit = self.driver.find_element_by_xpath("/html/body/div[1]/div/div/ \
-                                                    form/div[5]/button")
+        submit = self.driver.find_element_by_xpath("/html/body/div[1]/div/div/form/div[7]/button")
         submit.send_keys(Keys.RETURN)
         wait = WebDriverWait(self.driver, 2)
         try:
