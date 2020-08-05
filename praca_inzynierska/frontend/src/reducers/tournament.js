@@ -37,7 +37,7 @@ export default function (state = initialState, action) {
     case GET_TOURNAMENT_MATCH:
       return {
         isLoading: false,
-        match: action.payload,
+        match: action.payload.match,
       };
     case GET_TOURNAMENT_ORGANIZER:
       return {

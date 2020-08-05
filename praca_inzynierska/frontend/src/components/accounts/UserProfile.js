@@ -44,9 +44,8 @@ export class UserProfile extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
-    const { username, email, firstName, lastName } = this.state;
+    const { email, firstName, lastName } = this.state;
     const newUserProfile = {
-      username,
       email,
       first_name: firstName,
       last_name: lastName,

@@ -30,15 +30,12 @@ export const getUserProfile = () => (dispatch, getState) => {
     });
 };
 
-export const updateUserProfile = ({
-  username,
-  email,
-  first_name,
-  last_name,
-}) => (dispatch, getState) => {
+export const updateUserProfile = ({ email, first_name, last_name }) => (
+  dispatch,
+  getState
+) => {
   const config = setupToken(getState);
   const bodyRequest = JSON.stringify({
-    username,
     email,
     first_name,
     last_name,

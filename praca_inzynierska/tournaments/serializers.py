@@ -12,28 +12,6 @@ class TournamentSerializer(serializers.BaseSerializer):
         fields = ('id', 'name', 'city', 'address', 'end_of_registration', 'can_join',
                   'date', 'draw_size', 'description', 'started', 'participate')
 
-    def validate(self, data):
-        if not math.log2(data['draw_size']).is_integer() or \
-           data['draw_size'] > 64 or data['draw_size'] < 0:
-            raise serializers.ValidationError("Rozmiar drabinki turniejowej musi \
-                 być potęgą dwójki oraz dodatnią liczbą nie większą niż 64")
-
-        if not data['address'].split(" ").pop().isnumeric() or \
-           len(data['address'].split(" ")) <= 1:
-            raise serializers.ValidationError("Błędny adres")
-
-        actual_date = datetime.datetime.now().strftime("%Y-%m-%d")
-        given_date = data['date'].strftime("%Y-%m-%d")
-        if actual_date >= given_date:
-            raise serializers.ValidationError("Błędna data, turniej musi odbyć \
-                                               się w przyszłości")
-
-        if data['end_of_registration'] >= data['date']:
-            raise serializers.ValidationError("Zapisy do turnieju muszą się zakończyc \
-                                               przed rozpocząciem turnieju")
-
-        return data
-
     def update(self, instance, validated_data):
         instance.name = validated_data['name']
         instance.city = validated_data['city']
@@ -55,10 +33,54 @@ class TournamentSerializer(serializers.BaseSerializer):
             'draw_size': instance.draw_size,
             'description': instance.description,
             'end_of_registration': instance.end_of_registration,
-            'started': instance.started,
             'participate': False,
             'can_join': False,
         }
+
+    def to_internal_value(self, data):
+        return {
+            'name': data["name"],
+            'city': data["city"],
+            'address': data["address"],
+            'date': data["date"],
+            'draw_size': data["draw_size"],
+            'description': data["description"],
+            'end_of_registration': data["end_of_registration"]
+        }
+
+    def create(self, validated_data):
+        return Tournament.objects.create(name=validated_data['name'], city=validated_data['city'],
+                                         address=validated_data['address'], draw_size=validated_data['draw_size'],
+                                         description=validated_data['description'], organizer=validated_data['organizer'],
+                                         date=validated_data['date'], end_of_registration=validated_data['end_of_registration'])
+
+
+class CreateTournamentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tournament
+        fields = ('name', 'city', 'address', 'end_of_registration', 'date', 'draw_size', 'description', 'organizer')
+
+    def validate(self, data):
+        if not math.log2(data['draw_size']).is_integer() or \
+           data['draw_size'] > 64 or data['draw_size'] < 0:
+            raise serializers.ValidationError("Rozmiar drabinki turniejowej musi \
+                 być potęgą dwójki oraz dodatnią liczbą nie większą niż 64")
+
+        if not data['address'].split(" ").pop().isnumeric() or \
+           len(data['address'].split(" ")) <= 1:
+            raise serializers.ValidationError("Błędny adres")
+
+        actual_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        given_date = data['date'].strftime("%Y-%m-%d")
+        if actual_date >= given_date:
+            raise serializers.ValidationError("Błędna data, turniej musi odbyć \
+                                               się w przyszłości")
+
+        if data['end_of_registration'] >= data['date']:
+            raise serializers.ValidationError("Zapisy do turnieju muszą się zakończyc \
+                                               przed rozpocząciem turnieju")
+
+        return data
 
 
 class TournamentsPageSerializer(serializers.BaseSerializer):

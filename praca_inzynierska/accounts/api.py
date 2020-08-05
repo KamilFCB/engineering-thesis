@@ -60,6 +60,7 @@ class UserProfileAPI(generics.RetrieveUpdateAPIView):
         return self.request.user
 
     def put(self, request, *args, **kwargs):
+        request.data["username"] = self.request.user.username
         serializer = self.get_serializer(self.request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

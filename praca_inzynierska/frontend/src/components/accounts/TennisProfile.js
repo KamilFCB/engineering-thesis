@@ -123,7 +123,7 @@ export class TennisProfile extends Component {
               />
             </div>
             <div className="form-group">
-              <label>Forhend</label>
+              <label>Forehend</label>
               <select
                 name="forehand"
                 className="form-control"

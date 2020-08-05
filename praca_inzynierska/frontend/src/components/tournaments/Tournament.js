@@ -19,11 +19,6 @@ export class Tournament extends Component {
             </a>
           </li>
           <li className="nav-item">
-            <a className="nav-link" data-toggle="tab" href="#draw">
-              Drabinka
-            </a>
-          </li>
-          <li className="nav-item">
             <a className="nav-link" data-toggle="tab" href="#matches">
               Mecze
             </a>

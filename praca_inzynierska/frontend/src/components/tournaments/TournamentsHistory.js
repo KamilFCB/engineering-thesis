@@ -46,6 +46,13 @@ export class TournamentsHistory extends Component {
   render() {
     const { isLoading, tournaments } = this.state;
     const spinner = <Spinner />;
+    const noTournaments = (
+      <div className="tab-pane fade" id="tournamentsHistory">
+        <div className="card card-body">
+          <h2 className="text-center">Brak turniejów</h2>
+        </div>
+      </div>
+    );
     const page = (
       <div className="tab-pane fade" id="tournamentsHistory">
         <div className="card card-body">
@@ -85,7 +92,7 @@ export class TournamentsHistory extends Component {
         </div>
       </div>
     );
-    return isLoading ? spinner : page;
+    return isLoading ? spinner : tournaments.length ? page : noTournaments;
   }
 }
 

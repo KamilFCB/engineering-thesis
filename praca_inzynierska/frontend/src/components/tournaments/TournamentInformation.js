@@ -4,6 +4,7 @@ import { Spinner } from "../common/Spinner";
 import { connect } from "react-redux";
 import { getTournamentInformations } from "../../actions/tournament";
 import { joinTournament, leaveTournament } from "../../actions/tournaments";
+import { Link } from "react-router-dom";
 
 export class TournamentInformation extends Component {
   state = {
@@ -87,12 +88,19 @@ export class TournamentInformation extends Component {
       </button>
     );
 
-    if (participate) {
-      return leaveButton;
-    } else {
-      if (canJoin) return joinButton;
-      return registrationFinished;
-    }
+    const loginButton = (
+      <Link to="/logowanie">
+        <button type="button" className="btn btn-primary">
+          Zapisz się
+        </button>
+      </Link>
+    );
+
+    if (!this.props.auth.isAuthenticated) return loginButton;
+    if (participate) return leaveButton;
+    if (canJoin) return joinButton;
+
+    return registrationFinished;
   };
 
   render() {
@@ -135,13 +143,12 @@ export class TournamentInformation extends Component {
               </tr>
             </tbody>
           </table>
+          <p>{description}</p>
           <div className="row">
             <div className="col-md-4 offset-md-4 text-center">
               {this.getButton(participate, id, canJoin)}
             </div>
           </div>
-
-          <p>{description}</p>
         </div>
       </div>
     );
@@ -151,6 +158,7 @@ export class TournamentInformation extends Component {
 }
 
 const mapStateToProps = (state) => ({
+  auth: state.auth,
   tournament: state.tournament,
   tournaments: state.tournaments,
 });

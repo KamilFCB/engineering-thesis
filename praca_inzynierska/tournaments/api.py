@@ -17,22 +17,30 @@ import random
 import datetime
 
 
-class CreateTournamentAPI(generics.GenericAPIView):
+class CreateTournamentAPI(generics.CreateAPIView):
     permission_classes = [
         permissions.IsAuthenticated,
     ]
 
-    serializer_class = TournamentSerializer
+    serializer_class = CreateTournamentSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.validated_data['organizer'] = self.request.user
-        serializer.save()
+        try:
+            Tournament.objects.get(name=request.data["name"])
+        except Tournament.DoesNotExist:
+            request.data["organizer"] = self.request.user.id
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.validated_data['organizer'] = self.request.user
+            serializer.save()
 
-        return Response({
-            "message": "Turniej został utworzony"
-        }, status=201)
+            return Response({
+                "message": "Turniej został utworzony"
+            }, status=201)
+        else:
+            return Response({
+                "message": "Taki turniej już istnieje"
+            }, status=400)
 
 
 class TournamentAPI(generics.ListAPIView):
@@ -64,7 +72,7 @@ class TournamentAPI(generics.ListAPIView):
 class IncomingTournamentsPageAPI(generics.ListAPIView):
     serializer_class = TournamentsPageSerializer
     queryset = (Tournament.objects
-                          .filter(date__gt=datetime.datetime.now()).order_by('date'))
+                          .filter(date__gt=datetime.datetime.now(), accepted=True).order_by('date'))
 
     def get(self, request, *args, **kwargs):
         paginator = Paginator(self.queryset, 25)
@@ -74,15 +82,17 @@ class IncomingTournamentsPageAPI(generics.ListAPIView):
                            for tournament in page_obj.object_list]
         if self.request.user.is_authenticated:
             for tournament in serializer_list:
-                if tournament['end_of_registration'] >= datetime.datetime.now().date():
-                    tournament['can_join'] = True
-
                 try:
                     Participation.objects.get(player=self.request.user,
                                               tournament=tournament['id'])
                     tournament['participate'] = True
                 except Participation.DoesNotExist:
                     pass
+
+        for tournament in serializer_list:
+            if tournament['end_of_registration'] >= datetime.datetime.now().date():
+                tournament['can_join'] = True
+
         return Response({
             "tournaments": serializer_list,
             "hasMore": page_obj.has_next(),
@@ -93,7 +103,7 @@ class IncomingTournamentsPageAPI(generics.ListAPIView):
 class HistoryTournamentsPageAPI(generics.ListAPIView):
     serializer_class = TournamentsPageSerializer
     queryset = (Tournament.objects
-                          .filter(date__lt=datetime.datetime.now()).order_by('date'))
+                          .filter(date__lt=datetime.datetime.now(), accepted=True).order_by('date'))
 
     def get(self, request, *args, **kwargs):
         paginator = Paginator(self.queryset, 25)
@@ -125,7 +135,7 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            tournament = Tournament.objects.get(id=request.data['tournament'])
+            tournament = Tournament.objects.get(id=request.data['tournament'], accepted=True)
         except Tournament.DoesNotExist:
             return Response({
                 "message": "Taki turniej nie istnieje"
@@ -156,25 +166,31 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         try:
-            tournament = Tournament.objects.get(id=request.data['tournament'])
-            user = self.request.user
-            participation = Participation.objects.get(tournament=tournament,
-                                                      player=user)
-            if tournament.end_of_registration <= datetime.datetime.now().date():
-                return Response({
-                    "message": "Czas wypisów z tego turneju już minął"
-                }, status=406)
-
-            participation.delete()
-            serializer_data = self.get_serializer(tournament).data
-            serializer_data['participate'] = False
+            tournament = Tournament.objects.get(id=request.data['tournament'], accepted=True)
+        except Tournament.DoesNotExist:
             return Response({
-                "tournament": serializer_data
-            })
-        except Exception:
+                "message": "Taki turniej nie istnieje"
+            }, status=400)
+
+        user = self.request.user
+        try:
+            participation = Participation.objects.get(tournament=tournament, player=user)
+        except Participation.DoesNotExist:
             return Response({
                 "message": "Nie byłeś zapisany do tego turnieju"
             }, status=406)
+
+        if tournament.end_of_registration <= datetime.datetime.now().date():
+            return Response({
+                "message": "Czas wypisów z tego turneju już minął"
+            }, status=406)
+
+        participation.delete()
+        serializer_data = self.get_serializer(tournament).data
+        serializer_data['participate'] = False
+        return Response({
+            "tournament": serializer_data
+        })
 
 
 class TournamentParticipantsAPI(generics.ListAPIView):
@@ -183,7 +199,7 @@ class TournamentParticipantsAPI(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         tournament_id = kwargs['tournament_id']
         try:
-            tournament = Tournament.objects.get(pk=tournament_id)
+            tournament = Tournament.objects.get(pk=tournament_id, accepted=True)
         except Tournament.DoesNotExist:
             return Response({
                 "message": "Taki turniej nie istnieje"
@@ -227,11 +243,16 @@ class TournamentMatchesAPI(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         tournament_id = kwargs['tournament_id']
         try:
-            matches = Match.objects.filter(tournament_id=tournament_id).order_by("match_number")
+            tournament = Tournament.objects.get(id=tournament_id)
+            matches = Match.objects.filter(tournament=tournament).order_by("match_number")
         except Match.DoesNotExist:
             return Response({
                 "message": "Brak meczów"
-            }, status=406)
+            }, status=400)
+        except Tournament.DoesNotExist:
+            return Response({
+                "message": "Taki turniej nie istnieje"
+            }, status=400)
         else:
             matches_serializer = [prepare_match_data(self.get_serializer(match).data)
                                   for match in matches]
@@ -247,11 +268,11 @@ class TournamentOrganizerAPI(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         tournament_id = kwargs['tournament_id']
         try:
-            tournament = Tournament.objects.get(id=tournament_id)
+            tournament = Tournament.objects.get(id=tournament_id, accepted=True)
         except Tournament.DoesNotExist:
             return Response({
                 "message": "Nie ma takiego turnieju"
-            }, status=406)
+            }, status=400)
         else:
             return Response({
                 "organizer": tournament.organizer.id
@@ -268,7 +289,7 @@ class TournamentMatchAPI(generics.RetrieveUpdateAPIView):
         except Match.DoesNotExist:
             return Response({
                 "message": "Nie ma takiego meczu"
-            }, status=406)
+            }, status=400)
         else:
             match_serializer = self.get_serializer(match).data
             tournament = Tournament.objects.get(pk=match_serializer["tournament"])
@@ -280,7 +301,7 @@ class TournamentMatchAPI(generics.RetrieveUpdateAPIView):
             if match_serializer["player2"] is not None:
                 match_serializer["player2"] = prepare_player_match_profile(match_serializer["player2"])
 
-            return JsonResponse(match_serializer)
+            return Response({"match": match_serializer})
 
     def put(self, request, *args, **kwargs):
         match_id = kwargs['match_id']
@@ -289,7 +310,7 @@ class TournamentMatchAPI(generics.RetrieveUpdateAPIView):
         except Match.DoesNotExist:
             return Response({
                 "message": "Nie ma takiego meczu"
-            }, status=406)
+            }, status=400)
         else:
             if self.request.user.id != match.tournament.organizer.id:
                 return Response({
@@ -314,12 +335,12 @@ class PlayerMatchesAPI(generics.ListAPIView):
         page_number = kwargs['page_number']
         player_id = kwargs['player_id']
         try:
-            queryset = (Match.objects.filter(Q(player1_id=player_id) | Q(player2_id=player_id))
-                                     .order_by('-date'))
+            player = User.objects.get(id=player_id)
+            queryset = (Match.objects.filter(Q(player1=player) | Q(player2=player)).order_by('-date'))
         except User.DoesNotExist:
             return Response({
                 "message": "Nie ma takiego gracza"
-            }, status=406)
+            }, status=400)
         else:
             paginator = Paginator(queryset, 25)
             matches = paginator.get_page(page_number)
@@ -346,7 +367,7 @@ class StartTournamentAPI(generics.CreateAPIView):
     def get(self, request, *args, **kwargs):
         tournament_id = kwargs['tournament_id']
         try:
-            tournament = Tournament.objects.get(id=tournament_id)
+            tournament = Tournament.objects.get(id=tournament_id, accepted=True)
         except Tournament.DoesNotExist:
             return Response({
                 "message": "Nie ma takiego turnieju"
@@ -357,17 +378,17 @@ class StartTournamentAPI(generics.CreateAPIView):
                 return Response({
                     "message": "Nie jesteś organizatorem turnieju"
                 }, status=403)
-            
+
             if tournament.started:
                 return Response({
                     "message": "Turniej już się rozpoczął"
                 }, status=406)
-            
-            if tournament.end_of_registration != datetime.now():
+
+            if tournament.end_of_registration >= datetime.datetime.now().date():
                 return Response({
                     "message": "Nie możesz jeszcze rozpocząć tego turnieju, poczekaj do końca zapisów"
                 }, status=406)
-            
+
             matches_in_round = tournament.draw_size // 2
             round = 1
             match_number = 1
