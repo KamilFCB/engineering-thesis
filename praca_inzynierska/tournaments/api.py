@@ -2,7 +2,7 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .serializers import (TournamentSerializer, TournamentsPageSerializer,
                           TournamentMatchSerializer, TournamentOrganizerSerializer,
-                          RankingSerializer)
+                          RankingSerializer, CreateTournamentSerializer, TournamentDescriptionSerializer)
 from .models import Tournament, Participation, Match
 from django.core.paginator import Paginator
 from accounts.serializers import TournamentParticipantSerializer, PlayerMatchSerializer
@@ -491,3 +491,23 @@ class PlayersRankingAPI(generics.ListCreateAPIView):
                          'start_date': start_date.strftime("%Y-%m-%d"),
                          'end_date': end_date.strftime("%Y-%m-%d"),
                          'is_loading': False})
+
+
+class MainPageTournamentsAPI(generics.ListAPIView):
+    serializer_class = TournamentDescriptionSerializer
+
+    def get(self, request, *args, **kwargs):
+        try:
+            tournaments = Tournament.objects.filter(accepted=True, date__gt=datetime.datetime.now()).order_by('date')
+        except Tournament.DoesNotExist:
+            return Response({
+                "tournaments": [],
+                "is_loading": False,
+            })
+
+        tournaments_with_description = [self.get_serializer(tournament).data
+                                        for tournament in tournaments]
+        return Response({
+            "tournaments": tournaments_with_description[0:3],
+            "is_loading": False,
+        })

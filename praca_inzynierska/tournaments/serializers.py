@@ -135,3 +135,17 @@ class RankingSerializer(serializers.BaseSerializer):
             'place': 0,
             'points': 0,
         }
+
+
+class TournamentDescriptionSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = Tournament
+        fields: ('id', 'date', 'name', 'description')
+
+    def to_representation(self, instance):
+        return {
+            'id': instance.id,
+            'date': instance.date,
+            'name': instance.name,
+            'description': instance.description,
+        }

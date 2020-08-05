@@ -6,6 +6,7 @@ import {
   LEAVE_TOURNAMENT,
   GET_ORGANIZED_TOURNAMENTS,
   GET_PLAYERS_RANKING,
+  GET_MAIN_PAGE_TOURNAMENTS,
 } from "./types";
 import { setupToken } from "./auth";
 import { GET_ERRORS } from "./types";
@@ -178,6 +179,25 @@ export const getPlayersRanking = () => (dispatch, getState) => {
         createMessage({
           getRankingError:
             "Nie udało się pobrać rankingu, spróbuj ponownie za chwilę",
+        })
+      );
+    });
+};
+
+export const getMainPageTournaments = () => (dispatch, getState) => {
+  axios
+    .get("/api/tournaments/main_page")
+    .then((res) => {
+      dispatch({
+        type: GET_MAIN_PAGE_TOURNAMENTS,
+        payload: res.data,
+      });
+    })
+    .catch((err) => {
+      dispatch(
+        createMessage({
+          getTournamentsError:
+            "Nie udało się załadować turniejów, spróbuj ponownie",
         })
       );
     });

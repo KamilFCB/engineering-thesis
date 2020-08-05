@@ -8,7 +8,7 @@ import AlertTemplate from "react-alert-template-basic";
 
 import Header from "./layout/Header";
 import Alert from "./layout/Alert";
-import MainPage from "./layout/MainPage";
+import MainPage from "./tournaments/MainPage";
 import Login from "./accounts/Login";
 import Profile from "./accounts/Profile";
 import PlayerProfile from "./accounts/PlayerProfile";

@@ -5,6 +5,7 @@ import {
   LEAVE_TOURNAMENT,
   GET_ORGANIZED_TOURNAMENTS,
   GET_PLAYERS_RANKING,
+  GET_MAIN_PAGE_TOURNAMENTS,
 } from "../actions/types";
 
 const initialState = {
@@ -61,6 +62,11 @@ export default function (state = initialState, action) {
         ranking: action.payload.ranking,
         startDate: action.payload.start_date,
         endDate: action.payload.end_date,
+        isLoading: action.payload.is_loading,
+      };
+    case GET_MAIN_PAGE_TOURNAMENTS:
+      return {
+        tournaments: action.payload.tournaments,
         isLoading: action.payload.is_loading,
       };
     default:
