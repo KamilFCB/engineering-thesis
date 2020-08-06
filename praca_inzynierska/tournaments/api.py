@@ -35,11 +35,11 @@ class CreateTournamentAPI(generics.CreateAPIView):
             serializer.save()
 
             return Response({
-                "message": "Turniej został utworzony"
+                "message": "Turniej został utworzony, poczekaj na jego zatwierdzenie przez administratora"
             }, status=201)
         else:
             return Response({
-                "message": "Taki turniej już istnieje"
+                "message": "Turniej o takiej nazwie już istnieje"
             }, status=400)
 
 
@@ -399,8 +399,15 @@ class StartTournamentAPI(generics.CreateAPIView):
 
             random.shuffle(participants)
             for player1, player2 in zip(participants[0::2], participants[1::2]):
-                Match.objects.create(player1=player1, player2=player2, tournament=tournament,
-                                    round=round, match_number=match_number, date=tournament.date)
+                if player1 is None:
+                    Match.objects.create(player1=player1, player2=player2, tournament=tournament, round=round,
+                                         match_number=match_number, date=tournament.date, score="0:6 0:6")
+                elif player2 is None:
+                    Match.objects.create(player1=player1, player2=player2, tournament=tournament, round=round,
+                                         match_number=match_number, date=tournament.date, score="6:0 6:0")
+                else:
+                    Match.objects.create(player1=player1, player2=player2, tournament=tournament,
+                                         round=round, match_number=match_number, date=tournament.date)
                 match_number += 1
 
             round += 1

@@ -163,13 +163,12 @@ export class ManageMatch extends Component {
               onChange={this.onChange}
               value={player1 ? player1.id : "-"}
             >
-              <option value="-">{round == 1 ? "Wolny los" : "-"}</option>
               {!isEmpty(prevPlayer1) ? (
                 <option value={prevPlayer1.id}>
                   {prevPlayer1.first_name + " " + prevPlayer1.last_name}
                 </option>
               ) : (
-                ""
+                <option value="-">{round == 1 ? "Wolny los" : "-"}</option>
               )}
             </select>
           </div>
@@ -181,13 +180,12 @@ export class ManageMatch extends Component {
               onChange={this.onChange}
               value={player2 ? player2.id : "-"}
             >
-              <option value="-">{round == 1 ? "Wolny los" : "-"}</option>
               {!isEmpty(prevPlayer2) ? (
                 <option value={prevPlayer2.id}>
                   {prevPlayer2.first_name + " " + prevPlayer2.last_name}
                 </option>
               ) : (
-                ""
+                <option value="-">{round == 1 ? "Wolny los" : "-"}</option>
               )}
             </select>
           </div>
