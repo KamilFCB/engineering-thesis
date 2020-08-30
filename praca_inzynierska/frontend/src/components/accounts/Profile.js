@@ -3,6 +3,9 @@ import TennisProfile from "./TennisProfile";
 import UserProfile from "./UserProfile";
 
 export class Profile extends Component {
+  /**
+   * Profiles management view
+   */
   render() {
     return (
       <div className="container">

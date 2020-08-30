@@ -5,6 +5,9 @@ from .models import Tournament
 
 
 def prepare_match_data(serialized_data):
+    """
+        Returns match informations with players profiles
+    """
     if serialized_data["player1"] is not None:
         player1 = User.objects.get(pk=serialized_data["player1"])
         serialized_data["player1"] = TournamentParticipantSerializer(player1).data
@@ -29,6 +32,9 @@ def prepare_player_match_profile(player_id):
 
 
 def reverse_score(score):
+    """
+        Reverses tennis match score
+    """
     sets = []
     for set in score.split():
         gems = set.split(":")
@@ -38,6 +44,9 @@ def reverse_score(score):
 
 
 def number_of_first_match_in_round(round_number, draw_size):
+    """
+        Calculates number of first match in round
+    """
     result = 0
     for i in range(1, round_number):
         draw_size /= 2
@@ -47,6 +56,9 @@ def number_of_first_match_in_round(round_number, draw_size):
 
 
 def match_winner(match):
+    """
+        Returns match winner
+    """
     player1_won_sets = 0
     player2_won_sets = 0
 

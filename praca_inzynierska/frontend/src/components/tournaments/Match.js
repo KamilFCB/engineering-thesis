@@ -6,6 +6,9 @@ import { getTournamentMatch } from "../../actions/tournament";
 import Spinner from "../common/Spinner";
 
 export class Match extends Component {
+  /**
+   * Match view with players informations
+   */
   state = {
     isLoading: true,
     match: {},

@@ -3,6 +3,9 @@ import ManageTournamentMatches from "./ManageTournamentMatches";
 import StartTournament from "./StartTournament";
 
 export class ManageTournament extends Component {
+  /**
+   * Tournament management view
+   */
   render() {
     const tournamentId = this.props.match.params.id;
     return (

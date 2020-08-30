@@ -5,6 +5,9 @@ import PropTypes from "prop-types";
 import { login } from "../../actions/auth";
 
 export class Login extends Component {
+  /**
+   * Login view
+   */
   state = {
     username: "",
     password: "",

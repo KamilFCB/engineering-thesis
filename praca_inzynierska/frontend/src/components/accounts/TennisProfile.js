@@ -5,6 +5,9 @@ import { Spinner } from "../common/Spinner";
 import { getTennisProfile, updateTennisProfile } from "../../actions/profile";
 
 export class TennisProfile extends Component {
+  /**
+   * Tennis profile management view
+   */
   state = {
     residence: "",
     birthDate: "",

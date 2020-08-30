@@ -7,6 +7,9 @@ import { zip, range } from "lodash";
 import { Link } from "react-router-dom";
 
 export class TournamentParticipants extends Component {
+  /**
+   * Shows list of tournament participants
+   */
   state = {
     participants: [],
     isLoading: true,

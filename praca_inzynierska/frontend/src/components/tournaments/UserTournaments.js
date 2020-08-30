@@ -6,6 +6,9 @@ import { getUserOrganizedTournaments } from "../../actions/tournaments";
 import { Link } from "react-router-dom";
 
 export class UserTournaments extends Component {
+  /**
+   * Shows list of user tournaments
+   */
   state = {
     tournaments: [],
     isLoading: true,

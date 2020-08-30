@@ -11,6 +11,9 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { Link } from "react-router-dom";
 
 export class IncomingTournaments extends Component {
+  /**
+   * View of incoming tournaments with infinite scroll loading
+   */
   state = {
     isLoading: true,
     tournaments: [],

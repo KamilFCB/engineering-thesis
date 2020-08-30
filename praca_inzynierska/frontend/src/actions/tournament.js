@@ -15,6 +15,9 @@ export const getTournamentParticipants = (tournamentId) => (
   dispatch,
   getState
 ) => {
+  /**
+   * Get list of tournament participants
+   */
   axios
     .get(`/api/tournament/participants/${tournamentId}`)
     .then((res) => {
@@ -36,6 +39,9 @@ export const getTournamentInformations = (tournamentId) => (
   dispatch,
   getState
 ) => {
+  /**
+   * Get informations about tournamnet
+   */
   const config = setupToken(getState);
   axios
     .get(`/api/tournament/${tournamentId}`, config)
@@ -55,6 +61,9 @@ export const getTournamentInformations = (tournamentId) => (
 };
 
 export const getTournamentMatches = (tournamentId) => (dispatch, getState) => {
+  /**
+   * Get list of tournament matches
+   */
   axios
     .get(`/api/tournament/${tournamentId}/matches`)
     .then((res) => {
@@ -73,6 +82,9 @@ export const getTournamentMatches = (tournamentId) => (dispatch, getState) => {
 };
 
 export const getTournamentMatch = (matchId) => (dispatch, getState) => {
+  /**
+   * Get informations about tennis match
+   */
   axios
     .get(`/api/tournament/match/${matchId}`)
     .then((res) => {
@@ -94,6 +106,9 @@ export const getTournamentOrganizer = (tournamentId) => (
   dispatch,
   getState
 ) => {
+  /**
+   * Get tournament organizer
+   */
   axios
     .get(`/api/tournament/${tournamentId}/organizer`)
     .then((res) => {
@@ -112,6 +127,9 @@ export const getTournamentOrganizer = (tournamentId) => (
 };
 
 export const startTournament = (tournamentId) => (dispatch, getState) => {
+  /**
+   * Start tournament and draw a tournament bracket
+   */
   const config = setupToken(getState);
   axios
     .get(`/api/tournament/${tournamentId}/start`, config)
@@ -136,6 +154,9 @@ export const startTournament = (tournamentId) => (dispatch, getState) => {
 };
 
 export const prevMatchWinner = (match, player) => (dispatch, getState) => {
+  /**
+   * Get winner of previous match
+   */
   const config = setupToken(getState);
   const bodyRequest = JSON.stringify({
     match,
@@ -166,6 +187,9 @@ export const updateMatch = ({ matchId, player1, player2, score, time }) => (
   dispatch,
   getState
 ) => {
+  /**
+   * Update match informations
+   */
   const config = setupToken(getState);
   const bodyRequest = JSON.stringify({
     player1,

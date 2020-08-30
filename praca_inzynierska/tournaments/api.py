@@ -25,6 +25,9 @@ class CreateTournamentAPI(generics.CreateAPIView):
     serializer_class = CreateTournamentSerializer
 
     def post(self, request, *args, **kwargs):
+        """
+            Creates new tournament
+        """
         try:
             Tournament.objects.get(name=request.data["name"])
         except Tournament.DoesNotExist:
@@ -47,6 +50,9 @@ class TournamentAPI(generics.ListAPIView):
     serializer_class = TournamentSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns informations about tournament
+        """
         try:
             tournament = Tournament.objects.get(pk=kwargs['tournament_id'])
         except Tournament.DoesNotExist:
@@ -75,6 +81,9 @@ class IncomingTournamentsPageAPI(generics.ListAPIView):
                           .filter(date__gt=datetime.datetime.now(), accepted=True).order_by('date'))
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns page with incoming tournaments
+        """
         paginator = Paginator(self.queryset, 25)
         page_number = kwargs['page_number']
         page_obj = paginator.get_page(page_number)
@@ -101,6 +110,9 @@ class IncomingTournamentsPageAPI(generics.ListAPIView):
 
 
 class HistoryTournamentsPageAPI(generics.ListAPIView):
+    """
+        Return page with history tournaments
+    """
     serializer_class = TournamentsPageSerializer
     queryset = (Tournament.objects
                           .filter(date__lt=datetime.datetime.now(), accepted=True).order_by('date'))
@@ -134,6 +146,9 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
     serializer_class = TournamentsPageSerializer
 
     def post(self, request, *args, **kwargs):
+        """
+            Signs user up for the tournament
+        """
         try:
             tournament = Tournament.objects.get(id=request.data['tournament'], accepted=True)
         except Tournament.DoesNotExist:
@@ -165,6 +180,9 @@ class ParticipateTournamentAPI(generics.RetrieveDestroyAPIView):
         }, status=201)
 
     def delete(self, request, *args, **kwargs):
+        """
+            Unsubscribes user from the tournament
+        """
         try:
             tournament = Tournament.objects.get(id=request.data['tournament'], accepted=True)
         except Tournament.DoesNotExist:
@@ -197,6 +215,9 @@ class TournamentParticipantsAPI(generics.ListAPIView):
     serializer_class = TournamentParticipantSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns list of tournament participants
+        """
         tournament_id = kwargs['tournament_id']
         try:
             tournament = Tournament.objects.get(pk=tournament_id, accepted=True)
@@ -217,6 +238,9 @@ class OrganizedTournamentsAPI(generics.ListAPIView):
     serializer_class = TournamentsPageSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns list of organized tournaments
+        """
         user_id = kwargs['user_id']
         try:
             user = User.objects.get(id=user_id)
@@ -241,6 +265,9 @@ class TournamentMatchesAPI(generics.ListAPIView):
     serializer_class = TournamentMatchSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns list of tournament matches
+        """
         tournament_id = kwargs['tournament_id']
         try:
             tournament = Tournament.objects.get(id=tournament_id)
@@ -266,6 +293,9 @@ class TournamentOrganizerAPI(generics.ListAPIView):
     serializer_class = TournamentOrganizerSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns tournament organizer
+        """
         tournament_id = kwargs['tournament_id']
         try:
             tournament = Tournament.objects.get(id=tournament_id, accepted=True)
@@ -283,6 +313,9 @@ class TournamentMatchAPI(generics.RetrieveUpdateAPIView):
     serializer_class = TournamentMatchSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns informations about match
+        """
         match_id = kwargs['match_id']
         try:
             match = Match.objects.get(pk=match_id)
@@ -304,6 +337,9 @@ class TournamentMatchAPI(generics.RetrieveUpdateAPIView):
             return Response({"match": match_serializer})
 
     def put(self, request, *args, **kwargs):
+        """
+            Updates match informations
+        """
         match_id = kwargs['match_id']
         try:
             match = Match.objects.get(pk=match_id)
@@ -332,6 +368,9 @@ class PlayerMatchesAPI(generics.ListAPIView):
     serializer_class = TournamentMatchSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns page with player matches
+        """
         page_number = kwargs['page_number']
         player_id = kwargs['player_id']
         try:
@@ -345,7 +384,8 @@ class PlayerMatchesAPI(generics.ListAPIView):
             paginator = Paginator(queryset, 25)
             matches = paginator.get_page(page_number)
             matches_serializer = [prepare_match_data(self.get_serializer(match).data)
-                                  for match in matches]
+                                  for match in matches
+                                  if match.player1 is not None and match.player2 is not None]
 
             for match in matches_serializer:
                 if player_id != match["player1"]["id"]:
@@ -365,6 +405,9 @@ class StartTournamentAPI(generics.CreateAPIView):
     ]
 
     def get(self, request, *args, **kwargs):
+        """
+            Starts tournament and draws a bracket
+        """
         tournament_id = kwargs['tournament_id']
         try:
             tournament = Tournament.objects.get(id=tournament_id, accepted=True)
@@ -434,6 +477,9 @@ class PreviousMatchWinnerAPI(generics.ListAPIView):
     ]
 
     def post(self, request, *args, **kwargs):
+        """
+            Returns winner of previous round match
+        """
         match_id = request.data['match']
         player_number = request.data['player']
 
@@ -490,6 +536,9 @@ class PlayersRankingAPI(generics.ListCreateAPIView):
     serializer_class = RankingSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns list of players with at least one won match in last 365 days sorted descending by ranking points
+        """
         start_date = datetime.datetime.now() - datetime.timedelta(days=365)
         end_date = datetime.datetime.now()
         matches = Match.objects.filter(date__gte=start_date,
@@ -525,6 +574,9 @@ class MainPageTournamentsAPI(generics.ListAPIView):
     serializer_class = TournamentDescriptionSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns next three tournaments
+        """
         try:
             tournaments = Tournament.objects.filter(accepted=True, date__gt=datetime.datetime.now()).order_by('date')
         except Tournament.DoesNotExist:

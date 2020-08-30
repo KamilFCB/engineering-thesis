@@ -13,6 +13,9 @@ class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
+        """
+            Creates user account and tennis profile
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -28,6 +31,9 @@ class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
+        """
+            Login user
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
@@ -46,6 +52,9 @@ class UserAPI(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
     def get_object(self):
+        """
+            Returns username and email
+        """
         return self.request.user
 
 
@@ -57,9 +66,15 @@ class UserProfileAPI(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
 
     def get_object(self):
+        """
+            Returns user profile
+        """
         return self.request.user
 
     def put(self, request, *args, **kwargs):
+        """
+            Updates user profile
+        """
         request.data["username"] = self.request.user.username
         serializer = self.get_serializer(self.request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -75,12 +90,18 @@ class TennisProfileAPI(generics.RetrieveUpdateAPIView):
     serializer_class = TennisProfileSerializer
 
     def get_object(self):
+        """
+            Returns user tennis profile
+        """
         profile = TennisProfile.objects.get(user_id=self.request.user)
         serializer = self.get_serializer(profile)
 
         return serializer.data
 
     def put(self, request, *args, **kwargs):
+        """
+            Updates tennis profile
+        """
         if self.request.data['birth_date'] == "":
             self.request.data['birth_date'] = None
         profile = TennisProfile.objects.get(user_id=self.request.user)
@@ -94,6 +115,9 @@ class PlayerProfileAPI(generics.RetrieveAPIView):
     serializer_class = PlayerProfileSerializer
 
     def get(self, request, *args, **kwargs):
+        """
+            Returns user's first name, last name and tennis profile
+        """
         player_id = kwargs['player_id']
         try:
             tennis_profile = TennisProfile.objects.get(user_id=player_id)

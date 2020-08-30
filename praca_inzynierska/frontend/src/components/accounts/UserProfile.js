@@ -6,6 +6,9 @@ import { getUserProfile } from "../../actions/profile";
 import { Spinner } from "../common/Spinner";
 
 export class UserProfile extends Component {
+  /**
+   * User profile management view
+   */
   state = {
     username: "",
     email: "",

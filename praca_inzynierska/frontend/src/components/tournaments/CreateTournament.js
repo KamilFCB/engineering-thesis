@@ -4,6 +4,9 @@ import PropTypes from "prop-types";
 import { createTournament } from "../../actions/tournaments";
 
 export class CreateTournament extends Component {
+  /**
+   * View of create tournament form
+   */
   state = {
     name: "",
     city: "",

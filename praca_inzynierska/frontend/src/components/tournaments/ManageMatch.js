@@ -12,6 +12,9 @@ import Spinner from "../common/Spinner";
 import { isEmpty } from "lodash";
 
 export class ManageMatch extends Component {
+  /**
+   * Match update view
+   */
   state = {
     isLoading: true,
     matchId: null,

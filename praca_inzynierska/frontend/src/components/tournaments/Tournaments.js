@@ -3,6 +3,9 @@ import IncomingTournaments from "./IncomingTournaments";
 import TournamentsHistory from "./TournamentsHistory";
 
 export class Tournaments extends Component {
+  /**
+   * Tournaments view
+   */
   render() {
     return (
       <div className="container">

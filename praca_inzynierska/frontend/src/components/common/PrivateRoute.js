@@ -5,6 +5,9 @@ import PropTypes from "prop-types";
 import { Spinner } from "../common/Spinner";
 
 const PrivateRoute = ({ component: Component, auth, ...rest }) => (
+  /**
+   * Redirects to login page if user is not authenticated
+   */
   <Route
     {...rest}
     render={(props) => {

@@ -3,6 +3,9 @@ import { GET_PLAYER_PROFILE, GET_PLAYER_MATCHES } from "../actions/types";
 import { createMessage } from "./messages";
 
 export const getPlayerInformations = (playerId) => (dispatch, getState) => {
+  /**
+   * Get informations about player
+   */
   axios
     .get(`/api/player/${playerId}/informations`)
     .then((res) => {
@@ -24,6 +27,9 @@ export const getPlayerMatches = (playerId, pageNumber) => (
   dispatch,
   getState
 ) => {
+  /**
+   * Get list of player matches
+   */
   axios
     .get(`/api/player/${playerId}/matches/${pageNumber}`)
     .then((res) => {

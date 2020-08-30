@@ -7,6 +7,9 @@ import { Link } from "react-router-dom";
 import { parseInt } from "lodash";
 
 export class TournamentMatches extends Component {
+  /**
+   * Shows tournament matches grouped by round
+   */
   state = {
     isLoading: true,
     matches: [],

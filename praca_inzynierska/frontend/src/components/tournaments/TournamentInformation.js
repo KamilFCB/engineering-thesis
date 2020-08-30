@@ -7,6 +7,9 @@ import { joinTournament, leaveTournament } from "../../actions/tournaments";
 import { Link } from "react-router-dom";
 
 export class TournamentInformation extends Component {
+  /**
+   * Shows all informations about tournament
+   */
   state = {
     id: null,
     name: null,

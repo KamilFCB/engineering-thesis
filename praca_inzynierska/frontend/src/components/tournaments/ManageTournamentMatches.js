@@ -6,6 +6,9 @@ import { getTournamentMatches } from "../../actions/tournament";
 import { Link } from "react-router-dom";
 
 export class ManageTournamentMatches extends Component {
+  /**
+   * Tournament matches management view
+   */
   state = {
     isLoading: true,
     matches: [],

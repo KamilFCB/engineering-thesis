@@ -4,6 +4,9 @@ import TournamentParticipants from "./TournamentParticipants";
 import TournamentMatches from "./TournamentMatches";
 
 export class Tournament extends Component {
+  /**
+   * Tournament view
+   */
   render() {
     const tournamentId = this.props.match.params.id;
     return (

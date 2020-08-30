@@ -10,6 +10,9 @@ import {
 import { createMessage } from "../actions/messages";
 
 export const getUserProfile = () => (dispatch, getState) => {
+  /**
+   * Get user profile
+   */
   dispatch({ type: USER_PROFILE_LOADING });
   const config = setupToken(getState);
 
@@ -34,6 +37,9 @@ export const updateUserProfile = ({ email, first_name, last_name }) => (
   dispatch,
   getState
 ) => {
+  /**
+   * Update user profile
+   */
   const config = setupToken(getState);
   const bodyRequest = JSON.stringify({
     email,
@@ -62,6 +68,9 @@ export const updateUserProfile = ({ email, first_name, last_name }) => (
 };
 
 export const getTennisProfile = () => (dispatch, getState) => {
+  /**
+   * Get player tennis profile
+   */
   dispatch({ type: TENNIS_PROFILE_LOADING });
   const config = setupToken(getState);
 
@@ -90,6 +99,9 @@ export const updateTennisProfile = ({
   forehand,
   backhand,
 }) => (dispatch, getState) => {
+  /**
+   * Update player tennis profile
+   */
   const config = setupToken(getState);
   const bodyRequest = JSON.stringify({
     residence,

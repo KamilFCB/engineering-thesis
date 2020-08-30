@@ -4,6 +4,9 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 export class Alert extends Component {
+  /**
+   * Informs user about result of action
+   */
   static propTypes = {
     error: PropTypes.object.isRequired,
     message: PropTypes.object.isRequired,

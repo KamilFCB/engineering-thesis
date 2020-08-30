@@ -5,6 +5,9 @@ import { getPlayersRanking } from "../../actions/tournaments";
 import Spinner from "../common/Spinner";
 
 export class Ranking extends Component {
+  /**
+   * Shows list of players with at least one won match in last 365 days sorted desceding by ranking points
+   */
   state = {
     ranking: [],
     startDate: null,

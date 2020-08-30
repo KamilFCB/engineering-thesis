@@ -10,6 +10,9 @@ import {
 } from "../../actions/tournament";
 
 export class StartTournament extends Component {
+  /**
+   * Shows tournament informations and button to start tournament
+   */
   state = {
     tournamentOrganizer: null,
     name: null,

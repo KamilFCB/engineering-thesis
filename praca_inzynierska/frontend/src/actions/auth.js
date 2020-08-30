@@ -14,6 +14,9 @@ import {
 import { createMessage } from "../actions/messages";
 
 export const loadUser = () => (dispatch, getState) => {
+  /**
+   * Get user informations
+   */
   dispatch({ type: USER_LOADING });
 
   const config = setupToken(getState);
@@ -34,6 +37,9 @@ export const loadUser = () => (dispatch, getState) => {
 };
 
 export const login = (username, password) => (dispatch) => {
+  /**
+   * Login user
+   */
   const config = {
     headers: {
       "Content-Type": "application/json",
@@ -67,6 +73,9 @@ export const login = (username, password) => (dispatch) => {
 };
 
 export const logout = () => (dispatch, getState) => {
+  /**
+   * Logout user
+   */
   const config = setupToken(getState);
 
   axios
@@ -96,6 +105,9 @@ export const register = ({
   email,
   password,
 }) => (dispatch) => {
+  /**
+   * Create new account
+   */
   const config = {
     headers: {
       "Content-Type": "application/json",
@@ -135,6 +147,9 @@ export const register = ({
 };
 
 export const setupToken = (state) => {
+  /**
+   * Add token to request header
+   */
   const token = state().auth.token;
   const config = {
     headers: {

@@ -7,6 +7,9 @@ import { Link } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 export class PlayerProfile extends Component {
+  /**
+   * Player profile view - shows informations about player and played matches
+   */
   state = {
     isLoadingProfile: true,
     isLoadingMatches: true,
@@ -138,7 +141,9 @@ export class PlayerProfile extends Component {
                     {match.player2.first_name} {match.player2.last_name}
                   </Link>
                 </td>
-                <td>{match.score}</td>
+                <td>
+                  <Link to={"/mecz/" + match.id}>{match.score}</Link>
+                </td>
               </tr>
             ))}
           </tbody>

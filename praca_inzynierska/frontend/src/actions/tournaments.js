@@ -21,6 +21,9 @@ export const createTournament = ({
   description,
   end_of_registration,
 }) => (dispatch, getState) => {
+  /**
+   * Create new tournament
+   */
   const config = setupToken(getState);
   const bodyRequest = JSON.stringify({
     name,
@@ -53,6 +56,9 @@ export const getIncomingTournamentsPage = (pageNumber) => (
   dispatch,
   getState
 ) => {
+  /**
+   * Get page with incoming tournaments
+   */
   const config = setupToken(getState);
   axios
     .get(`/api/tournaments/incoming/page/${pageNumber}`, config)
@@ -76,6 +82,9 @@ export const getHistoryTournamentsPage = (pageNumber) => (
   dispatch,
   getState
 ) => {
+  /**
+   * Get page with history tournaments
+   */
   const config = setupToken(getState);
   axios
     .get(`/api/tournaments/history/page/${pageNumber}`, config)
@@ -96,6 +105,9 @@ export const getHistoryTournamentsPage = (pageNumber) => (
 };
 
 export const joinTournament = (tournamentId) => (dispatch, getState) => {
+  /**
+   * Join the tournament
+   */
   const config = setupToken(getState);
   const bodyRequest = JSON.stringify({
     tournament: tournamentId,
@@ -119,6 +131,9 @@ export const joinTournament = (tournamentId) => (dispatch, getState) => {
 };
 
 export const leaveTournament = (tournamentId) => (dispatch, getState) => {
+  /**
+   * Leave the tournament
+   */
   const token = getState().auth.token;
   axios
     .delete("/api/tournament/participate", {
@@ -146,6 +161,9 @@ export const leaveTournament = (tournamentId) => (dispatch, getState) => {
 };
 
 export const getUserOrganizedTournaments = (userId) => (dispatch, getState) => {
+  /**
+   * Get list of organized tournaments
+   */
   const config = setupToken(getState);
   axios
     .get(`/api/tournaments/organized/${userId}`, config)
@@ -166,6 +184,9 @@ export const getUserOrganizedTournaments = (userId) => (dispatch, getState) => {
 };
 
 export const getPlayersRanking = () => (dispatch, getState) => {
+  /**
+   * Get players ranking list
+   */
   axios
     .get("/api/ranking")
     .then((res) => {
@@ -185,6 +206,9 @@ export const getPlayersRanking = () => (dispatch, getState) => {
 };
 
 export const getMainPageTournaments = () => (dispatch, getState) => {
+  /**
+   * Get next three tournaments shown on home page
+   */
   axios
     .get("/api/tournaments/main_page")
     .then((res) => {

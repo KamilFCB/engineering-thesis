@@ -6,6 +6,9 @@ import { getMainPageTournaments } from "../../actions/tournaments";
 import { Link } from "react-router-dom";
 
 export class MainPage extends Component {
+  /**
+   * Application's main page view - shows next three tournaments
+   */
   state = {
     isLoading: true,
     tournaments: [],
